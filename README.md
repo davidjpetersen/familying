@@ -1,3 +1,5 @@
+# Familying
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
@@ -19,6 +21,28 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Environment variables
+
+Create a `.env.local` file in the project root. This file is ignored by Git.
+
+Required keys:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+```
+
+Notes:
+
+- Only variables prefixed with `NEXT_PUBLIC_` are exposed to the browser. All others remain server-only.
+- Never use `CLERK_SECRET_KEY` or `SUPABASE_SERVICE_ROLE_KEY` in client components or code that runs in the browser.
+- See `.env.example` for the full list of keys.
+
+After updating `.env.local`, restart the dev server.
 
 ## Learn More
 
