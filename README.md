@@ -45,6 +45,14 @@ Notes:
 
 After updating `.env.local`, restart the dev server.
 
+## Supabase Storage
+
+The application expects the following buckets to exist:
+
+- `sleep-sounds`
+- `images`
+- `pdf`
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
