@@ -22,6 +22,9 @@ export function SiteHeader() {
             <Button asChild variant="ghost">
               <Link href="/dashboard">Dashboard</Link>
             </Button>
+            <Button asChild variant="ghost">
+              <Link href="/settings">Settings</Link>
+            </Button>
             <UserButton appearance={{ elements: { userButtonAvatarBox: "size-8" } }} />
           </SignedIn>
         </nav>
