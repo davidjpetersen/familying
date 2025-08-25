@@ -1,11 +1,19 @@
 import Link from 'next/link';
-import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, CheckCircle, Smartphone, Users, Heart, Star } from "lucide-react";
 
-export default function Home() {
+export default async function Home() {
+  const { userId } = await auth();
+  
+  // Redirect authenticated users to dashboard
+  if (userId) {
+    redirect('/dashboard');
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">
       {/* Navigation */}
@@ -19,20 +27,12 @@ export default function Home() {
               </Link>
             </div>
             <div className="flex items-center space-x-4">
-              <SignedOut>
-                <Button variant="ghost" asChild>
-                  <Link href="/sign-in">Sign In</Link>
-                </Button>
-                <Button asChild>
-                  <Link href="/sign-up">Get Started</Link>
-                </Button>
-              </SignedOut>
-              <SignedIn>
-                <Button variant="ghost" asChild>
-                  <Link href="/dashboard">Dashboard</Link>
-                </Button>
-                <UserButton />
-              </SignedIn>
+              <Button variant="ghost" asChild>
+                <Link href="/sign-in">Sign In</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/sign-up">Get Started</Link>
+              </Button>
             </div>
           </div>
         </div>
@@ -54,25 +54,15 @@ export default function Home() {
             Keep everyone in sync with shared calendars, tasks, and memories.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-            <SignedOut>
-              <Button size="lg" asChild>
-                <Link href="/sign-up">
-                  <Users className="mr-2 h-4 w-4" />
-                  Start Free Trial
-                </Link>
-              </Button>
-              <Button variant="outline" size="lg" asChild>
-                <Link href="/sign-in">Sign In</Link>
-              </Button>
-            </SignedOut>
-            <SignedIn>
-              <Button size="lg" asChild>
-                <Link href="/dashboard">
-                  <Users className="mr-2 h-4 w-4" />
-                  Go to Dashboard
-                </Link>
-              </Button>
-            </SignedIn>
+            <Button size="lg" asChild>
+              <Link href="/sign-up">
+                <Users className="mr-2 h-4 w-4" />
+                Start Free Trial
+              </Link>
+            </Button>
+            <Button variant="outline" size="lg" asChild>
+              <Link href="/sign-in">Sign In</Link>
+            </Button>
           </div>
         </div>
       </div>
