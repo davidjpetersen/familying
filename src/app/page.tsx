@@ -4,7 +4,8 @@ import { redirect } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, CheckCircle, Smartphone, Users, Heart, Star } from "lucide-react";
+import { Calendar, CheckCircle, Smartphone, Users, Star } from "lucide-react";
+import { Navbar } from "@/components/Navbar";
 
 export default async function Home() {
   const { userId } = await auth();
@@ -17,26 +18,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">
       {/* Navigation */}
-      <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Link href="/" className="flex items-center space-x-2">
-                <Heart className="h-8 w-8 text-primary" />
-                <span className="text-2xl font-bold text-primary">Familying</span>
-              </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" asChild>
-                <Link href="/sign-in">Sign In</Link>
-              </Button>
-              <Button asChild>
-                <Link href="/sign-up">Get Started</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar variant="home" />
 
       {/* Hero Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">

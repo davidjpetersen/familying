@@ -1,12 +1,9 @@
-import { UserButton } from '@clerk/nextjs';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { 
-  Heart, 
   Calendar, 
   CheckCircle, 
   Camera, 
@@ -17,6 +14,7 @@ import {
   Users,
   Clock
 } from "lucide-react";
+import { Navbar } from "@/components/Navbar";
 
 export default async function DashboardPage() {
   const { userId } = await auth();
@@ -28,22 +26,7 @@ export default async function DashboardPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Link href="/" className="flex items-center space-x-2">
-                <Heart className="h-8 w-8 text-primary" />
-                <span className="text-2xl font-bold text-primary">Familying</span>
-              </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Badge variant="outline">Dashboard</Badge>
-              <UserButton />
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar variant="dashboard" />
 
       {/* Dashboard Content */}
       <div className="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">

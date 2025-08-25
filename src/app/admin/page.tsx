@@ -1,4 +1,3 @@
-import { UserButton } from '@clerk/nextjs';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -7,21 +6,21 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { 
-  Heart, 
-  Shield, 
-  Users, 
-  Settings, 
+import {
+  Shield,
+  Users,
+  Settings,
   Database,
   Activity,
   AlertTriangle,
   UserPlus,
   UserMinus,
-  Crown
+  Crown,
+  UserCog
 } from "lucide-react";
 import { checkIsAdmin, getAllAdmins, type Admin } from '@/lib/admin';
-
-function formatRoleName(role: Admin['role']): string {
+import { AdminStats } from '@/components/admin/AdminStats';
+import { Navbar } from "@/components/Navbar";function formatRoleName(role: Admin['role']): string {
   return role.replace('_', ' ');
 }
 
@@ -32,79 +31,44 @@ export default async function AdminDashboardPage() {
     redirect('/sign-in');
   }
 
-  // Check if user is admin
-  const adminStatus = await checkIsAdmin(userId);
-  
-  if (!adminStatus || !adminStatus.role) {
+  // Check if user is an admin
+  const admin = await checkIsAdmin(userId);
+  if (!admin) {
     redirect('/dashboard');
   }
 
-  // At this point, adminStatus is guaranteed to exist and have a role
-  const admin = adminStatus as Admin;
-
-  // Get all admins for the admin table
   const allAdmins = await getAllAdmins();
-
-  const getRoleBadgeVariant = (role: Admin['role']) => {
-    switch (role) {
-      case 'super_admin':
-        return 'destructive';
-      case 'admin':
-        return 'default';
-      case 'moderator':
-        return 'secondary';
-      default:
-        return 'outline';
-    }
-  };
 
   const getRoleIcon = (role: Admin['role']) => {
     switch (role) {
       case 'super_admin':
-        return <Crown className="h-4 w-4" />;
+        return <Crown className="h-3 w-3" />;
       case 'admin':
-        return <Shield className="h-4 w-4" />;
+        return <Shield className="h-3 w-3" />;
       case 'moderator':
-        return <Users className="h-4 w-4" />;
+        return <UserCog className="h-3 w-3" />;
       default:
-        return null;
+        return <Shield className="h-3 w-3" />;
     }
   };
 
-  const formatRoleName = (role: string | undefined): string => {
-    if (!role) return 'Unknown';
-    return role.replace('_', ' ');
+  const getRoleBadgeVariant = (role: Admin['role']) => {
+    switch (role) {
+      case 'super_admin':
+        return 'destructive' as const;
+      case 'admin':
+        return 'default' as const;
+      case 'moderator':
+        return 'secondary' as const;
+      default:
+        return 'outline' as const;
+    }
   };
 
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="flex items-center space-x-2">
-                <Heart className="h-8 w-8 text-primary" />
-                <span className="text-2xl font-bold text-primary">Familying</span>
-              </Link>
-              <Badge variant="destructive" className="flex items-center space-x-1">
-                <Shield className="h-3 w-3" />
-                <span>Admin Panel</span>
-              </Badge>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" asChild>
-                <Link href="/dashboard">Dashboard</Link>
-              </Button>
-              <Badge variant="outline" className="flex items-center space-x-1">
-                {getRoleIcon(admin.role)}
-                <span className="capitalize">{formatRoleName(admin.role)}</span>
-              </Badge>
-              <UserButton />
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar variant="admin" />
 
       {/* Admin Dashboard Content */}
       <div className="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">
@@ -117,49 +81,10 @@ export default async function AdminDashboardPage() {
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-8">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Admins</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{allAdmins.length}</div>
-                <p className="text-xs text-muted-foreground">
-                  Active system administrators
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">System Status</CardTitle>
-                <Activity className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">Healthy</div>
-                <p className="text-xs text-muted-foreground">
-                  All systems operational
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Your Role</CardTitle>
-                <Crown className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold capitalize">{formatRoleName(admin.role)}</div>
-                <p className="text-xs text-muted-foreground">
-                  Access level and permissions
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+          <AdminStats />
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 mb-8">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-8">
             <Card>
               <CardHeader>
                 <CardTitle>Plugin Management</CardTitle>
@@ -172,6 +97,23 @@ export default async function AdminDashboardPage() {
                   <Link href="/admin/plugins">
                     <Settings className="mr-2 h-4 w-4" />
                     Manage Plugins
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>User Management</CardTitle>
+                <CardDescription>
+                  Manage admin users and permissions
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button asChild className="w-full">
+                  <Link href="/admin/users">
+                    <Users className="mr-2 h-4 w-4" />
+                    Manage Users
                   </Link>
                 </Button>
               </CardContent>
