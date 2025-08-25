@@ -1,0 +1,38 @@
+{
+	"servers": {
+		"MCP_DOCKER": {
+			"command": "docker",
+			"args": [
+				"mcp",
+				"gateway",
+				"run"
+			],
+			"type": "stdio"
+		},
+		"supabase": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@supabase/mcp-server-supabase@latest",
+				"--read-only",
+				"--project-ref=<project-ref>"
+			],
+			"env": {
+				"SUPABASE_ACCESS_TOKEN": "${input:supabase-access-token}"
+			},
+			"type": "stdio"
+		},
+		"familying-vercel": {
+			"url": "https://mcp.vercel.com/familying/familying",
+			"type": "http"
+		}
+	},
+	"inputs": [
+		{
+			"type": "promptString",
+			"id": "supabase-access-token",
+			"description": "Supabase personal access token",
+			"password": true
+		}
+	]
+}
