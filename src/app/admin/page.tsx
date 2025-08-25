@@ -18,7 +18,7 @@ import {
   Crown,
   UserCog
 } from "lucide-react";
-import { checkIsAdmin, getAllAdmins, type Admin } from '@/lib/admin';
+import { checkIsAdmin, getAllAdmins, type Admin } from '@/lib/admin-adapter';
 import { AdminStats } from '@/components/admin/AdminStats';
 import { Navbar } from "@/components/Navbar";function formatRoleName(role: Admin['role']): string {
   return role.replace('_', ' ');
