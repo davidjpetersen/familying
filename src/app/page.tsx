@@ -1,38 +1,36 @@
 import Link from 'next/link';
 import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, CheckCircle, Smartphone, Users, Heart, Star } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted">
       {/* Navigation */}
-      <nav className="bg-white shadow-sm">
+      <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-indigo-600">Familying</h1>
+              <Link href="/" className="flex items-center space-x-2">
+                <Heart className="h-8 w-8 text-primary" />
+                <span className="text-2xl font-bold text-primary">Familying</span>
+              </Link>
             </div>
             <div className="flex items-center space-x-4">
               <SignedOut>
-                <Link
-                  href="/sign-in"
-                  className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/sign-up"
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-                >
-                  Get Started
-                </Link>
+                <Button variant="ghost" asChild>
+                  <Link href="/sign-in">Sign In</Link>
+                </Button>
+                <Button asChild>
+                  <Link href="/sign-up">Get Started</Link>
+                </Button>
               </SignedOut>
               <SignedIn>
-                <Link
-                  href="/dashboard"
-                  className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Dashboard
-                </Link>
+                <Button variant="ghost" asChild>
+                  <Link href="/dashboard">Dashboard</Link>
+                </Button>
                 <UserButton />
               </SignedIn>
             </div>
@@ -43,94 +41,98 @@ export default function Home() {
       {/* Hero Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center">
-          <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+          <Badge variant="secondary" className="mb-6">
+            <Star className="w-4 h-4 mr-1" />
+            Trusted by families worldwide
+          </Badge>
+          <h1 className="text-4xl tracking-tight font-extrabold text-foreground sm:text-5xl md:text-6xl">
             <span className="block">Bring Your Family</span>
-            <span className="block text-indigo-600">Together</span>
+            <span className="block text-primary">Together</span>
           </h1>
-          <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+          <p className="mt-6 max-w-md mx-auto text-base text-muted-foreground sm:text-lg md:mt-8 md:text-xl md:max-w-3xl">
             The ultimate platform for family planning, coordination, and connection. 
             Keep everyone in sync with shared calendars, tasks, and memories.
           </p>
-          <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
+          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
             <SignedOut>
-              <div className="rounded-md shadow">
-                <Link
-                  href="/sign-up"
-                  className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10"
-                >
+              <Button size="lg" asChild>
+                <Link href="/sign-up">
+                  <Users className="mr-2 h-4 w-4" />
                   Start Free Trial
                 </Link>
-              </div>
-              <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
-                <Link
-                  href="/sign-in"
-                  className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10"
-                >
-                  Sign In
-                </Link>
-              </div>
+              </Button>
+              <Button variant="outline" size="lg" asChild>
+                <Link href="/sign-in">Sign In</Link>
+              </Button>
             </SignedOut>
             <SignedIn>
-              <div className="rounded-md shadow">
-                <Link
-                  href="/dashboard"
-                  className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10"
-                >
+              <Button size="lg" asChild>
+                <Link href="/dashboard">
+                  <Users className="mr-2 h-4 w-4" />
                   Go to Dashboard
                 </Link>
-              </div>
+              </Button>
             </SignedIn>
           </div>
         </div>
       </div>
 
       {/* Features Section */}
-      <div className="py-12 bg-white">
+      <div className="py-24 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:text-center">
-            <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">Features</h2>
-            <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+            <Badge variant="secondary" className="mb-4">Features</Badge>
+            <h2 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
               Everything your family needs
+            </h2>
+            <p className="mt-4 max-w-2xl text-xl text-muted-foreground lg:mx-auto">
+              Powerful tools designed to bring families closer together and make life easier.
             </p>
           </div>
 
-          <div className="mt-10">
-            <div className="space-y-10 md:space-y-0 md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-10">
-              <div className="text-center">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white mx-auto">
-                  📅
-                </div>
-                <div className="mt-5">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900">Shared Calendar</h3>
-                  <p className="mt-2 text-base text-gray-500">
+          <div className="mt-16">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+              <Card className="text-center">
+                <CardHeader>
+                  <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-primary text-primary-foreground mx-auto">
+                    <Calendar className="h-6 w-6" />
+                  </div>
+                  <CardTitle>Shared Calendar</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
                     Keep everyone synchronized with shared family events and schedules.
-                  </p>
-                </div>
-              </div>
+                  </CardDescription>
+                </CardContent>
+              </Card>
 
-              <div className="text-center">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white mx-auto">
-                  ✅
-                </div>
-                <div className="mt-5">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900">Task Management</h3>
-                  <p className="mt-2 text-base text-gray-500">
+              <Card className="text-center">
+                <CardHeader>
+                  <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-primary text-primary-foreground mx-auto">
+                    <CheckCircle className="h-6 w-6" />
+                  </div>
+                  <CardTitle>Task Management</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
                     Assign and track household tasks and responsibilities.
-                  </p>
-                </div>
-              </div>
+                  </CardDescription>
+                </CardContent>
+              </Card>
 
-              <div className="text-center">
-                <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white mx-auto">
-                  📱
-                </div>
-                <div className="mt-5">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900">Mobile Ready</h3>
-                  <p className="mt-2 text-base text-gray-500">
+              <Card className="text-center">
+                <CardHeader>
+                  <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-primary text-primary-foreground mx-auto">
+                    <Smartphone className="h-6 w-6" />
+                  </div>
+                  <CardTitle>Mobile Ready</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>
                     Access your family hub from anywhere on any device.
-                  </p>
-                </div>
-              </div>
+                  </CardDescription>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
