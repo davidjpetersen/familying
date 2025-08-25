@@ -36,10 +36,25 @@ export interface AuthHelpers {
   assertRole: (user: User, role: string) => Promise<void>
 }
 
+// Define allowed database operations to prevent arbitrary SQL execution
+export interface DatabaseOperation {
+  table: string
+  operation: 'select' | 'insert' | 'update' | 'delete'
+  where?: Record<string, any>
+  data?: Record<string, any>
+  columns?: string[]
+}
+
+export interface QueryOptions {
+  limit?: number
+  offset?: number
+  orderBy?: { column: string; ascending?: boolean }
+}
+
 export interface DatabaseHelpers {
-  execute: (query: string, params?: any[]) => Promise<any>
-  query: (query: string, params?: any[]) => Promise<any>
-  transaction: <T>(fn: (tx: any) => Promise<T>) => Promise<T>
+  query: (operation: DatabaseOperation, options?: QueryOptions) => Promise<any>
+  execute: (operationName: string, params?: Record<string, any>) => Promise<any>
+  transaction: <T>(fn: (helpers: DatabaseHelpers) => Promise<T>) => Promise<T>
 }
 
 export interface PluginContext {

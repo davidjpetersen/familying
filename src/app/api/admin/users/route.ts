@@ -2,211 +2,180 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { clerkClient } from '@clerk/nextjs/server'
 import { addAdmin, checkIsAdmin, getAllAdmins, removeAdmin, updateAdminRole, type Admin } from '@/lib/admin'
+import { createErrorResponse, AuthenticationError, AuthorizationError, ValidationError, DatabaseError, asyncHandler } from '@/lib/errors'
+import { validateRequestBody, createAdminSchema, updateAdminRoleSchema, deleteAdminSchema } from '@/lib/validation'
 
-export async function GET(request: NextRequest) {
+export const GET = asyncHandler(async function(request: NextRequest) {
+  const { userId } = await auth()
+  
+  if (!userId) {
+    throw new AuthenticationError('Authentication required')
+  }
+
+  // Check admin permissions
+  const admin = await checkIsAdmin(userId)
+  if (!admin) {
+    throw new AuthorizationError('Admin access required')
+  }
+
   try {
-    const { userId } = await auth()
-    
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Check admin permissions
-    const admin = await checkIsAdmin(userId)
-    if (!admin) {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
-    }
-
     const admins = await getAllAdmins()
     
-    // Enrich with Clerk user data
-    const enrichedAdmins = await Promise.all(
-      admins.map(async (adminUser) => {
-        try {
-          const client = await clerkClient()
-          const clerkUser = await client.users.getUser(adminUser.clerk_user_id)
-          return {
-            ...adminUser,
-            clerkData: {
-              firstName: clerkUser.firstName,
-              lastName: clerkUser.lastName,
-              imageUrl: clerkUser.imageUrl,
-              lastSignInAt: clerkUser.lastSignInAt,
-              createdAt: clerkUser.createdAt
-            }
-          }
-        } catch (error) {
-          console.error(`Error fetching Clerk data for user ${adminUser.clerk_user_id}:`, error)
-          return {
-            ...adminUser,
-            clerkData: null
-          }
-        }
-      })
-    )
+    // Fetch all Clerk user data in batch to avoid N+1 query problem
+    const clerkUserIds = admins.map(admin => admin.clerk_user_id)
+    const client = await clerkClient()
+    
+    // Use Clerk's batch user fetching
+    const clerkUsers = await client.users.getUserList({
+      userId: clerkUserIds,
+      limit: clerkUserIds.length
+    })
 
-    return NextResponse.json({ admins: enrichedAdmins })
+    // Create a map for fast lookup
+    const clerkUserMap = new Map(
+      clerkUsers.data.map(user => [user.id, user])
+    )
+    
+    // Enrich admin data with Clerk user information
+    const enrichedAdmins = admins.map(adminUser => {
+      const clerkUser = clerkUserMap.get(adminUser.clerk_user_id)
+      return {
+        ...adminUser,
+        clerkData: clerkUser ? {
+          firstName: clerkUser.firstName,
+          lastName: clerkUser.lastName,
+          imageUrl: clerkUser.imageUrl,
+          lastSignInAt: clerkUser.lastSignInAt,
+          createdAt: clerkUser.createdAt
+        } : null
+      }
+    })
+
+    return NextResponse.json({ 
+      admins: enrichedAdmins,
+      total: enrichedAdmins.length
+    })
 
   } catch (error) {
     console.error('Error fetching admins:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch admins' },
-      { status: 500 }
-    )
+    const errorResponse = createErrorResponse(error)
+    return NextResponse.json(errorResponse.error, { status: errorResponse.statusCode })
   }
-}
+})
 
-export async function POST(request: NextRequest) {
+export const POST = asyncHandler(async function(request: NextRequest) {
+  const { userId } = await auth()
+  
+  if (!userId) {
+    throw new AuthenticationError('Authentication required')
+  }
+
+  // Check admin permissions (only super_admin can add admins)
+  const admin = await checkIsAdmin(userId)
+  if (!admin || admin.role !== 'super_admin') {
+    throw new AuthorizationError('Super admin access required')
+  }
+
   try {
-    const { userId } = await auth()
-    
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Check admin permissions (only super_admin can add admins)
-    const admin = await checkIsAdmin(userId)
-    if (!admin || admin.role !== 'super_admin') {
-      return NextResponse.json({ error: 'Super admin access required' }, { status: 403 })
-    }
-
-    const body = await request.json()
-    const { clerkUserId, email, role = 'admin' } = body
-
-    if (!clerkUserId || !email) {
-      return NextResponse.json(
-        { error: 'Clerk user ID and email are required' },
-        { status: 400 }
-      )
-    }
+    const validatedData = await validateRequestBody(request, createAdminSchema)
 
     // Verify the Clerk user exists
-    try {
-      const client = await clerkClient()
-      await client.users.getUser(clerkUserId)
-    } catch (error) {
-      return NextResponse.json(
-        { error: 'Clerk user not found' },
-        { status: 404 }
-      )
+    const client = await clerkClient()
+    const clerkUser = await client.users.getUser(validatedData.clerkUserId)
+    
+    if (!clerkUser) {
+      throw new ValidationError('Clerk user not found')
     }
 
     // Check if already an admin
-    const existingAdmin = await checkIsAdmin(clerkUserId)
+    const existingAdmin = await checkIsAdmin(validatedData.clerkUserId)
     if (existingAdmin) {
-      return NextResponse.json(
-        { error: 'User is already an admin' },
-        { status: 409 }
-      )
+      throw new ValidationError('User is already an admin')
     }
 
-    const newAdmin = await addAdmin(clerkUserId, email, role)
-    
-    if (!newAdmin) {
-      return NextResponse.json(
-        { error: 'Failed to add admin' },
-        { status: 500 }
-      )
-    }
+    // Add the admin
+    const newAdmin = await addAdmin(
+      validatedData.clerkUserId,
+      validatedData.email,
+      validatedData.role
+    )
 
-    return NextResponse.json({ admin: newAdmin }, { status: 201 })
+    return NextResponse.json({ 
+      admin: newAdmin,
+      message: 'Admin added successfully'
+    }, { status: 201 })
 
   } catch (error) {
     console.error('Error adding admin:', error)
-    return NextResponse.json(
-      { error: 'Failed to add admin' },
-      { status: 500 }
-    )
+    const errorResponse = createErrorResponse(error)
+    return NextResponse.json(errorResponse.error, { status: errorResponse.statusCode })
   }
-}
+})
 
-export async function PUT(request: NextRequest) {
+export const PUT = asyncHandler(async function(request: NextRequest) {
+  const { userId } = await auth()
+  
+  if (!userId) {
+    throw new AuthenticationError('Authentication required')
+  }
+
+  // Check admin permissions
+  const admin = await checkIsAdmin(userId)
+  if (!admin) {
+    throw new AuthorizationError('Admin access required')
+  }
+
   try {
-    const { userId } = await auth()
-    
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Check admin permissions
-    const admin = await checkIsAdmin(userId)
-    if (!admin) {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
-    }
-
-    const body = await request.json()
-    const { clerkUserId, role } = body
-
-    if (!clerkUserId || !role) {
-      return NextResponse.json(
-        { error: 'Clerk user ID and role are required' },
-        { status: 400 }
-      )
-    }
+    const validatedData = await validateRequestBody(request, updateAdminRoleSchema)
 
     // Only super_admin can modify other admins
-    if (admin.role !== 'super_admin' && admin.clerk_user_id !== clerkUserId) {
-      return NextResponse.json(
-        { error: 'Super admin access required to modify other admins' },
-        { status: 403 }
-      )
+    if (admin.role !== 'super_admin' && admin.clerk_user_id !== validatedData.adminId) {
+      throw new AuthorizationError('Super admin access required to modify other admins')
     }
 
     // Prevent super_admin from demoting themselves if they're the only super_admin
-    if (admin.clerk_user_id === clerkUserId && admin.role === 'super_admin' && role !== 'super_admin') {
+    if (admin.clerk_user_id === validatedData.adminId && admin.role === 'super_admin' && validatedData.role !== 'super_admin') {
       const allAdmins = await getAllAdmins()
       const superAdmins = allAdmins.filter(a => a.role === 'super_admin')
       
       if (superAdmins.length <= 1) {
-        return NextResponse.json(
-          { error: 'Cannot demote the last super admin' },
-          { status: 400 }
-        )
+        throw new ValidationError('Cannot demote the last super admin')
       }
     }
 
-    const updatedAdmin = await updateAdminRole(clerkUserId, role)
+    const updatedAdmin = await updateAdminRole(validatedData.adminId, validatedData.role)
     
-    if (!updatedAdmin) {
-      return NextResponse.json(
-        { error: 'Failed to update admin role' },
-        { status: 500 }
-      )
-    }
-
-    return NextResponse.json({ admin: updatedAdmin })
+    return NextResponse.json({ 
+      admin: updatedAdmin,
+      message: 'Admin role updated successfully'
+    })
 
   } catch (error) {
     console.error('Error updating admin:', error)
-    return NextResponse.json(
-      { error: 'Failed to update admin' },
-      { status: 500 }
-    )
+    const errorResponse = createErrorResponse(error)
+    return NextResponse.json(errorResponse.error, { status: errorResponse.statusCode })
   }
-}
+})
 
-export async function DELETE(request: NextRequest) {
+export const DELETE = asyncHandler(async function(request: NextRequest) {
+  const { userId } = await auth()
+  
+  if (!userId) {
+    throw new AuthenticationError('Authentication required')
+  }
+
+  // Check admin permissions
+  const admin = await checkIsAdmin(userId)
+  if (!admin || admin.role !== 'super_admin') {
+    throw new AuthorizationError('Super admin access required')
+  }
+
   try {
-    const { userId } = await auth()
-    
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Check admin permissions
-    const admin = await checkIsAdmin(userId)
-    if (!admin || admin.role !== 'super_admin') {
-      return NextResponse.json({ error: 'Super admin access required' }, { status: 403 })
-    }
-
     const { searchParams } = new URL(request.url)
     const clerkUserId = searchParams.get('clerkUserId')
 
     if (!clerkUserId) {
-      return NextResponse.json(
-        { error: 'Clerk user ID is required' },
-        { status: 400 }
-      )
+      throw new ValidationError('Clerk user ID is required')
     }
 
     // Prevent super_admin from removing themselves if they're the only super_admin
@@ -215,29 +184,23 @@ export async function DELETE(request: NextRequest) {
       const superAdmins = allAdmins.filter(a => a.role === 'super_admin')
       
       if (superAdmins.length <= 1) {
-        return NextResponse.json(
-          { error: 'Cannot remove the last super admin' },
-          { status: 400 }
-        )
+        throw new ValidationError('Cannot remove the last super admin')
       }
     }
 
     const success = await removeAdmin(clerkUserId)
     
     if (!success) {
-      return NextResponse.json(
-        { error: 'Failed to remove admin' },
-        { status: 500 }
-      )
+      throw new DatabaseError('Failed to remove admin')
     }
 
-    return NextResponse.json({ message: 'Admin removed successfully' })
+    return NextResponse.json({ 
+      message: 'Admin removed successfully'
+    })
 
   } catch (error) {
     console.error('Error removing admin:', error)
-    return NextResponse.json(
-      { error: 'Failed to remove admin' },
-      { status: 500 }
-    )
+    const errorResponse = createErrorResponse(error)
+    return NextResponse.json(errorResponse.error, { status: errorResponse.statusCode })
   }
-}
+})
