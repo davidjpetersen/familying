@@ -71,10 +71,6 @@ export async function Navbar({ variant = 'home', showAuthButtons = true }: Navba
                   </Button>
                 )}
                 
-                {variant === 'dashboard' && (
-                  <Badge variant="outline">Dashboard</Badge>
-                )}
-                
                 {variant === 'admin' && (
                   <>
                     <Button variant="ghost" asChild>
