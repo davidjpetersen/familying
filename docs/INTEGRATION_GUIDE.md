@@ -149,7 +149,7 @@ export const GET = withAdminAuth(async (request) => {
 ## Next Steps
 
 1. **Replace** existing `/src/lib/admin.ts` usage with `/src/lib/admin-adapter.ts`
-2. **Update** your current admin page to use the new `/src/app/admin/page-new.tsx`
+2. **Update** your current admin page to use the new `/src/app/admin/page.tsx`
 3. **Add** permission guards to sensitive UI components
 4. **Extend** the architecture for user management and plugins
 5. **Implement** event-driven features (notifications, audit logs)

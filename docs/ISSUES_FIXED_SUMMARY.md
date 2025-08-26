@@ -2,7 +2,7 @@
 
 ## Summary of Fixes Applied
 
-### ✅ 1. Admin Page State Management (src/app/admin/page-new.tsx)
+### ✅ 1. Admin Page State Management (src/app/admin/page.tsx)
 **Issue**: Async admin-check could cause multiple redirects or state updates after unmount
 **Fix**: Added mounted flags to both useEffect hooks (lines 44-60 and health check useEffect)
 - Added `let mounted = true` at start of each useEffect
