@@ -29,7 +29,8 @@ class PluginManager {
     try {
       await this.discoverPlugins()
       await this.registerPlugins()
-      await this.runMigrations()
+      // Temporarily disable migrations until we fix the SQL execution
+      // await this.runMigrations()
       
       this.initialized = true
       console.log(`Plugin manager initialized with ${this.registry.plugins.size} plugins`)
