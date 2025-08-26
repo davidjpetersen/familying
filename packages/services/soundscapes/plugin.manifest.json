@@ -1,0 +1,14 @@
+{
+  "name": "soundscapes",
+  "displayName": "Soundscapes",
+  "version": "1.0.0",
+  "author": "Family Team",
+  "description": "A calming audio gallery for families with ambient sounds and white noise",
+  "routes": {
+    "user": ["/app/soundscapes", "/app/soundscapes/:category"],
+    "admin": ["/admin/soundscapes", "/admin/soundscapes/upload", "/admin/soundscapes/:id/edit"],
+    "api": ["/api/soundscapes", "/api/soundscapes/:id", "/api/soundscapes/upload"]
+  },
+  "migrations": ["migrations/0001_create_soundscapes_table.sql"],
+  "configSchemaRef": "#config"
+}

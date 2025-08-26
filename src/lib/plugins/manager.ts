@@ -29,7 +29,8 @@ class PluginManager {
     try {
       await this.discoverPlugins()
       await this.registerPlugins()
-      await this.runMigrations()
+      // Temporarily disable migrations to test plugin functionality
+      // await this.runMigrations()
       
       this.initialized = true
       console.log(`Plugin manager initialized with ${this.registry.plugins.size} plugins`)
@@ -81,18 +82,34 @@ class PluginManager {
       // Validate package.json exists
       await stat(packagePath)
       
-      // Load the plugin module (this would need to be compiled first in a real setup)
-      // For now, we'll create a mock plugin structure
+      // For development, we'll use a static import registry
+      // In production, this would use a proper module loading system
+      let pluginModule: any = null
+      
+      switch (pluginName) {
+        case 'soundscapes':
+          pluginModule = await import('../../../packages/services/soundscapes/src/index')
+          break
+        case 'todo-list':
+          try {
+            pluginModule = await import('../../../packages/services/todo-list/src/index')
+          } catch (e) {
+            console.warn(`Todo-list plugin not found, skipping`)
+          }
+          break
+        default:
+          console.warn(`Plugin ${pluginName} not registered in static import registry`)
+          return null
+      }
+      
+      if (!pluginModule || typeof pluginModule.register !== 'function') {
+        throw new Error(`Plugin ${pluginName} does not export a register function`)
+      }
+      
       const plugin: Plugin = {
         manifest,
-        register: async (context: PluginContext) => {
-          // This would import and call the actual plugin's register function
-          console.log(`Registering plugin: ${manifest.name}`)
-          return {}
-        },
-        deregister: async (context: PluginContext) => {
-          console.log(`Deregistering plugin: ${manifest.name}`)
-        }
+        register: pluginModule.register,
+        deregister: pluginModule.deregister
       }
       
       return plugin
@@ -133,7 +150,10 @@ class PluginManager {
           const migrationPath = resolve(process.cwd(), this.pluginsDir, name, migration)
           const migrationSql = await readFile(migrationPath, 'utf-8')
           
-          await runMigration(migrationSql, `${name}_${migration}`)
+          // Extract just the filename for validation, not the full path, and remove extension
+          const migrationFileName = migration.split('/').pop() || migration
+          const migrationNameWithoutExt = migrationFileName.replace(/\.(sql|ts|js)$/, '')
+          await runMigration(migrationSql, `${name}_${migrationNameWithoutExt}`)
           result.appliedMigrations.push(`${name}/${migration}`)
           
           console.log(`Applied migration: ${name}/${migration}`)

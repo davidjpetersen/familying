@@ -143,6 +143,7 @@ export function createDatabaseHelpers(): DatabaseHelpers {
 // Migration runner with security checks
 export async function runMigration(migrationSql: string, migrationName: string): Promise<any> {
   // Validate migration name to prevent path traversal
+  console.log('Validating migration name:', JSON.stringify(migrationName))
   if (!/^[a-zA-Z0-9_-]+$/.test(migrationName)) {
     throw new Error('Invalid migration name: only alphanumeric, underscore, and dash characters allowed')
   }
