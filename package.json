@@ -9,11 +9,19 @@
     "create:plugin": "node scripts/create-plugin.mjs",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "demo:plugin-system": "npx ts-node src/infrastructure/demo/test-runner.ts demo",
+    "test:plugin-system": "npx ts-node src/infrastructure/demo/test-runner.ts integration"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.31.4",
     "@hookform/resolvers": "^5.2.1",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.62.1",
+    "@opentelemetry/exporter-jaeger": "^2.0.1",
+    "@opentelemetry/resources": "^2.0.1",
+    "@opentelemetry/sdk-node": "^0.203.0",
+    "@opentelemetry/semantic-conventions": "^1.36.0",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
@@ -32,6 +40,7 @@
     "react-dom": "19.1.0",
     "react-hook-form": "^7.62.0",
     "tailwind-merge": "^3.3.1",
+    "vm2": "^3.9.19",
     "zod": "^4.1.1"
   },
   "devDependencies": {
