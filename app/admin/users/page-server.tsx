@@ -3,9 +3,9 @@ import { redirect } from 'next/navigation';
 import { checkIsAdmin } from '@/lib/admin-adapter';
 import { checkIsAdminDirect } from '@/lib/admin-adapter-direct';
 import { AdminLayout } from '@/components/admin/AdminLayout';
-import AdminPluginsClient from './AdminPluginsClient';
+import { AdminUsersClient } from './AdminUsersClient';
 
-export default async function AdminPluginsPage() {
+export default async function AdminUsersPage() {
   const { userId } = await auth();
   
   if (!userId) {
@@ -24,7 +24,7 @@ export default async function AdminPluginsPage() {
 
   return (
     <AdminLayout requireAuth={false}>
-      <AdminPluginsClient />
+      <AdminUsersClient currentAdmin={admin} />
     </AdminLayout>
   );
 }
