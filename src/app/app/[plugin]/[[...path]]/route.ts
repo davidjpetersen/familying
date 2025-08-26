@@ -4,30 +4,34 @@ import { ensurePluginsInitialized } from '@/lib/plugins/init'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { plugin: string; path?: string[] } }
+  { params }: { params: Promise<{ plugin: string; path?: string[] }> }
 ) {
-  return handlePluginRoute(request, params, 'GET', 'user')
+  const resolvedParams = await params
+  return handlePluginRoute(request, resolvedParams, 'GET', 'user')
 }
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { plugin: string; path?: string[] } }
+  { params }: { params: Promise<{ plugin: string; path?: string[] }> }
 ) {
-  return handlePluginRoute(request, params, 'POST', 'user')
+  const resolvedParams = await params
+  return handlePluginRoute(request, resolvedParams, 'POST', 'user')
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { plugin: string; path?: string[] } }
+  { params }: { params: Promise<{ plugin: string; path?: string[] }> }
 ) {
-  return handlePluginRoute(request, params, 'PUT', 'user')
+  const resolvedParams = await params
+  return handlePluginRoute(request, resolvedParams, 'PUT', 'user')
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { plugin: string; path?: string[] } }
+  { params }: { params: Promise<{ plugin: string; path?: string[] }> }
 ) {
-  return handlePluginRoute(request, params, 'DELETE', 'user')
+  const resolvedParams = await params
+  return handlePluginRoute(request, resolvedParams, 'DELETE', 'user')
 }
 
 async function handlePluginRoute(

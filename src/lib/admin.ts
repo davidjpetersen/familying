@@ -7,6 +7,7 @@ export interface Admin {
   role: 'super_admin' | 'admin' | 'moderator'
   created_at: string
   updated_at: string
+  isActive?: boolean
 }
 
 export async function checkIsAdmin(clerkUserId: string): Promise<Admin | null> {

@@ -1,5 +1,8 @@
-import { auth } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
+'use client'
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@clerk/nextjs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
@@ -8,23 +11,133 @@ import {
   Settings,
   Database,
   Activity,
-  AlertTriangle
+  AlertTriangle,
+  Loader2
 } from "lucide-react";
-import { checkIsAdmin } from '@/lib/admin-adapter';
 import { Navbar } from "@/components/Navbar";
 import { AdminManagement } from "@/components/admin/AdminManagement";
+import { HealthCheckResult } from "@/lib/health/health-checks";
 
-export default async function AdminDashboardPage() {
-  const { userId } = await auth();
+interface AdminData {
+  id: string;
+  email: string;
+  role: string;
+}
+
+export default function AdminDashboardPage() {
+  const { user, isLoaded } = useUser();
+  const router = useRouter();
+  const [admin, setAdmin] = useState<AdminData | null>(null);
+  const [healthChecks, setHealthChecks] = useState<HealthCheckResult[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [healthLoading, setHealthLoading] = useState(true);
   
-  if (!userId) {
-    redirect('/sign-in');
+  useEffect(() => {
+    if (!isLoaded) return;
+    
+    if (!user) {
+      router.push('/sign-in');
+      return;
+    }
+
+    let mounted = true;
+
+    async function checkAdminStatus() {
+      try {
+        const response = await fetch('/api/admin/check');
+        const result = await response.json();
+        
+        if (!mounted) return; // Component unmounted, don't proceed
+        
+        if (!result.success || !result.data?.isActive) {
+          router.push('/dashboard');
+          return;
+        }
+        
+        setAdmin(result.data);
+      } catch (error) {
+        console.error('Error checking admin status:', error);
+        if (mounted) {
+          router.push('/dashboard');
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    checkAdminStatus();
+
+    return () => {
+      mounted = false;
+    };
+  }, [user, isLoaded, router]);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadHealthChecks() {
+      try {
+        const response = await fetch('/api/health/all');
+        const result = await response.json();
+        
+        if (!mounted) return; // Component unmounted, don't proceed
+        
+        setHealthChecks(result.data || []);
+      } catch (error) {
+        console.error('Error loading health checks:', error);
+        
+        if (!mounted) return; // Component unmounted, don't proceed
+        
+        // Set fallback health data
+        setHealthChecks([
+          { service: 'API', status: 'down', message: 'Check failed' },
+          { service: 'Database', status: 'down', message: 'Check failed' },
+          { service: 'Authentication', status: 'down', message: 'Check failed' },
+          { service: 'CDN', status: 'down', message: 'Check failed' }
+        ]);
+      } finally {
+        if (mounted) {
+          setHealthLoading(false);
+        }
+      }
+    }
+
+    loadHealthChecks();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const handleQuickAction = (path: string) => {
+    router.push(path);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'operational':
+        return 'bg-green-50 text-green-600';
+      case 'degraded':
+        return 'bg-yellow-50 text-yellow-600';
+      case 'down':
+        return 'bg-red-50 text-red-600';
+      default:
+        return 'bg-gray-50 text-gray-600';
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
   }
 
-  // Check if user is an admin using the new architecture
-  const admin = await checkIsAdmin(userId);
   if (!admin) {
-    redirect('/dashboard');
+    return null; // Will redirect
   }
 
   return (
@@ -35,7 +148,7 @@ export default async function AdminDashboardPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
           <p className="text-gray-600 mt-2">
-            Welcome back, {admin.email}. You have {admin.role.replace('_', ' ')} privileges.
+            Welcome back, {admin.email}. You have {admin.role.replaceAll('_', ' ')} privileges.
           </p>
         </div>
 
@@ -111,7 +224,13 @@ export default async function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="p-4 hover:bg-gray-50 cursor-pointer transition-colors">
+                <Card 
+                  className="p-4 hover:bg-gray-50 cursor-pointer transition-colors"
+                  onClick={() => handleQuickAction('/admin/users')}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === 'Enter' && handleQuickAction('/admin/users')}
+                >
                   <div className="flex items-center">
                     <Users className="h-8 w-8 text-blue-500 mr-3" />
                     <div>
@@ -121,7 +240,13 @@ export default async function AdminDashboardPage() {
                   </div>
                 </Card>
 
-                <Card className="p-4 hover:bg-gray-50 cursor-pointer transition-colors">
+                <Card 
+                  className="p-4 hover:bg-gray-50 cursor-pointer transition-colors"
+                  onClick={() => handleQuickAction('/admin/database')}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === 'Enter' && handleQuickAction('/admin/database')}
+                >
                   <div className="flex items-center">
                     <Database className="h-8 w-8 text-green-500 mr-3" />
                     <div>
@@ -131,7 +256,13 @@ export default async function AdminDashboardPage() {
                   </div>
                 </Card>
 
-                <Card className="p-4 hover:bg-gray-50 cursor-pointer transition-colors">
+                <Card 
+                  className="p-4 hover:bg-gray-50 cursor-pointer transition-colors"
+                  onClick={() => handleQuickAction('/admin/logs')}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === 'Enter' && handleQuickAction('/admin/logs')}
+                >
                   <div className="flex items-center">
                     <Activity className="h-8 w-8 text-purple-500 mr-3" />
                     <div>
@@ -157,28 +288,42 @@ export default async function AdminDashboardPage() {
                 <Alert>
                   <Activity className="h-4 w-4" />
                   <AlertDescription>
-                    All systems operational. Last backup completed successfully at 3:00 AM.
+                    {healthLoading 
+                      ? "Checking system status..." 
+                      : healthChecks.every(h => h.status === 'operational')
+                        ? "All systems operational. Last backup completed successfully at 3:00 AM."
+                        : "Some services are experiencing issues. Check individual status below."
+                    }
                   </AlertDescription>
                 </Alert>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                    <span className="text-sm font-medium">API Status</span>
-                    <span className="text-green-600 font-semibold">Operational</span>
+                {healthLoading ? (
+                  <div className="flex items-center justify-center p-8">
+                    <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                    <span>Loading system status...</span>
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                    <span className="text-sm font-medium">Database</span>
-                    <span className="text-green-600 font-semibold">Healthy</span>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {healthChecks.map((check, index) => (
+                      <div 
+                        key={index}
+                        className={`flex items-center justify-between p-3 rounded-lg ${getStatusColor(check.status)}`}
+                      >
+                        <span className="text-sm font-medium">{check.service}</span>
+                        <div className="flex items-center">
+                          <span className="font-semibold capitalize mr-2">
+                            {check.status}
+                          </span>
+                          {check.responseTime && (
+                            <span className="text-xs">
+                              ({check.responseTime}ms)
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                    <span className="text-sm font-medium">Authentication</span>
-                    <span className="text-green-600 font-semibold">Active</span>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                    <span className="text-sm font-medium">CDN</span>
-                    <span className="text-green-600 font-semibold">Online</span>
-                  </div>
-                </div>
+                )}
               </div>
             </CardContent>
           </Card>

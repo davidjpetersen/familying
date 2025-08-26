@@ -1,47 +1,35 @@
-import { auth } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { getAppContainer, SERVICE_TOKENS } from '@/bootstrap'
-import { GetAdminByClerkIdQuery } from '@/application/use-cases/admin-use-cases'
-import { Mediator } from '@/application/use-cases/base'
+import { requireAdmin } from '@/lib/auth-utils'
 
 export async function GET(request: NextRequest) {
   try {
-    const { userId } = await auth()
+    const authResult = await requireAdmin()
     
-    if (!userId) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Unauthorized' 
-      }, { status: 401 })
-    }
-
-    const container = getAppContainer()
-    const mediator = container.resolve<Mediator>(SERVICE_TOKENS.MEDIATOR)
-
-    const result = await mediator.send(new GetAdminByClerkIdQuery(userId))
-
-    if (result.isFailure()) {
+    if (authResult instanceof NextResponse) {
       return NextResponse.json({ 
         success: false, 
         data: null 
-      })
+      }, { status: 401 })
     }
 
-    const admin = result.getValue() as any
+    const { admin } = authResult
 
     return NextResponse.json({ 
-      success: true,
+      success: true, 
       data: {
         id: admin.id,
         email: admin.email,
         role: admin.role,
-        isActive: admin.isActive
+        isActive: admin.isActive ?? false
       }
     })
   } catch (error) {
-    console.error('Admin check API error:', error)
+    console.error('Admin check error:', error)
     return NextResponse.json(
-      { success: false, error: 'Internal server error' }, 
+      { 
+        success: false, 
+        error: 'Internal server error' 
+      }, 
       { status: 500 }
     )
   }

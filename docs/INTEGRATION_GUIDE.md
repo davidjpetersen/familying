@@ -37,9 +37,16 @@ GET /api/admin/permissions?permission=MANAGE_USERS
 
 ```typescript
 // /src/app/admin/page.tsx
+import { auth } from '@clerk/nextjs/server';
 import { checkIsAdmin } from '@/lib/admin-adapter';
 
 export default async function AdminPage() {
+  const { userId } = await auth(); // Get current user ID from Clerk auth
+  
+  if (!userId) {
+    redirect('/sign-in');
+  }
+  
   const admin = await checkIsAdmin(userId);
   // Uses clean architecture under the hood
 }

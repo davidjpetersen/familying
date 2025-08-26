@@ -1,4 +1,3 @@
-import { auth } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAppContainer, SERVICE_TOKENS } from '@/bootstrap'
 import { 
@@ -8,13 +7,22 @@ import {
 } from '@/application/use-cases/admin-use-cases'
 import { Mediator } from '@/application/use-cases/base'
 import { AdminRole } from '@/domain/entities/admin'
+import { requireAdmin, requirePermissions } from '@/lib/auth-utils'
 
 export async function GET(request: NextRequest) {
   try {
-    const { userId } = await auth()
+    const authResult = await requireAdmin()
     
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (authResult instanceof NextResponse) {
+      return authResult
+    }
+
+    const { admin } = authResult
+
+    // Only admins and super_admins can list admins
+    const permissionError = requirePermissions(admin, 'admin')
+    if (permissionError) {
+      return permissionError
     }
 
     const container = getAppContainer()
@@ -42,10 +50,18 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth()
+    const authResult = await requireAdmin()
     
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (authResult instanceof NextResponse) {
+      return authResult
+    }
+
+    const { admin } = authResult
+
+    // Only super_admins can create new admins
+    const permissionError = requirePermissions(admin, 'super_admin')
+    if (permissionError) {
+      return permissionError
     }
 
     const container = getAppContainer()

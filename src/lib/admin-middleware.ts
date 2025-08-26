@@ -53,14 +53,19 @@ export async function checkAdminAccess(
   }
 }
 
+// Types for Next.js route handler context
+interface RouteContext {
+  params?: Record<string, string | string[]>
+}
+
 /**
  * Create an admin-only route handler wrapper
  */
 export function withAdminAuth(
-  handler: (request: NextRequest, context: any) => Promise<NextResponse>,
+  handler: (request: NextRequest, context: RouteContext) => Promise<NextResponse>,
   requiredPermission?: Permission
 ) {
-  return async (request: NextRequest, context: any) => {
+  return async (request: NextRequest, context: RouteContext) => {
     const { authorized, error } = await checkAdminAccess(request, requiredPermission)
     
     if (!authorized) {

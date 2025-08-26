@@ -1,4 +1,4 @@
-import { AdminEntity } from '../../domain/entities/admin'
+import { AdminEntity, AdminRole, Permission } from '../../domain/entities/admin'
 import { 
   AdminRepository, 
   AdminFilters, 
@@ -10,6 +10,29 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js'
 /**
  * Supabase implementation of AdminRepository
  */
+// Types for Supabase database rows
+interface AdminDbRow {
+  id: string
+  clerk_user_id: string
+  email: string
+  role: AdminRole
+  permissions?: Permission[]
+  created_at: string
+  updated_at: string
+  is_active: boolean
+}
+
+interface AdminInsertData {
+  id: string
+  clerk_user_id: string
+  email: string
+  role: AdminRole
+  permissions: Permission[]
+  created_at: string
+  updated_at: string
+  is_active: boolean
+}
+
 export class SupabaseAdminRepository implements AdminRepository {
   private client: SupabaseClient
 
@@ -240,7 +263,7 @@ export class SupabaseAdminRepository implements AdminRepository {
     }
   }
 
-  private mapToEntity(row: any): AdminEntity {
+  private mapToEntity(row: AdminDbRow): AdminEntity {
     return AdminEntity.create({
       clerkUserId: row.clerk_user_id,
       email: row.email,
@@ -252,13 +275,13 @@ export class SupabaseAdminRepository implements AdminRepository {
     }, row.id)
   }
 
-  private mapToRow(admin: AdminEntity): any {
+  private mapToRow(admin: AdminEntity): AdminInsertData {
     return {
       id: admin.id,
       clerk_user_id: admin.clerkUserId,
       email: admin.email,
       role: admin.role,
-      permissions: admin.permissions,
+      permissions: [...admin.permissions],
       created_at: admin.createdAt.toISOString(),
       updated_at: admin.updatedAt.toISOString(),
       is_active: admin.isActive
