@@ -10,6 +10,13 @@
 !.yarn/releases
 !.yarn/versions
 
+# Plugin dependencies and build artifacts
+packages/services/*/node_modules/
+packages/services/*/dist/
+packages/services/*/.next/
+packages/services/*/out/
+packages/services/*/*.tsbuildinfo
+
 # testing
 /coverage
 
