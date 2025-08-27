@@ -1,0 +1,32 @@
+{
+  "decks": [
+    {"title":"Dinner Starters","subtitle":"Quick conversations at the table","hero_image_url":"/img/dinner.jpg","status":"published"}
+  ],
+  "cards": [
+    {
+      "prompt_text":"What was the funniest part of your day?",
+      "follow_ups":["Who was there?","What made it funny?"],
+      "age_variants":{"4-6":"What made you giggle today?"},
+      "type":"question",
+      "tags":{"context":["dinner"],"mood":"calm","energy":"low"},
+      "tone":"thoughtful",
+      "status":"published"
+    },
+    {
+      "prompt_text":"Would you rather fly like a bird or swim like a dolphin?",
+      "follow_ups":["Why?","When would you use it the most?"],
+      "type":"would_you_rather",
+      "tags":{"context":["car","dinner"],"energy":"med"},
+      "tone":"silly",
+      "status":"published"
+    },
+    {
+      "prompt_text":"Tell a 3-sentence story that starts with \u201cA tiny robot knocked on our door\u2026\u201d",
+      "follow_ups":["Add a twist!","Give it a name."],
+      "type":"story_starter",
+      "tags":{"context":["bedtime"],"mood":"calm"},
+      "tone":"creative",
+      "status":"published"
+    }
+  ]
+}
