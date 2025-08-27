@@ -1,0 +1,87 @@
+import { NextRequest, NextResponse } from 'next/server'
+import type { AuthHelpers, DatabaseHelpers, Logger, RouteHandler } from '../../../../src/lib/plugins/types'
+
+interface RouteDependencies {
+  db: DatabaseHelpers
+  logger: Logger
+  auth: AuthHelpers
+}
+
+export function createUserRoutes({ db, logger, auth }: RouteDependencies): Record<string, RouteHandler> {
+  return {
+    // API route for fetching soundscapes data (used by the React component)
+    'GET:/api/data': async () => {
+      try {
+        // This would normally fetch from database
+        // For now, return sample data
+        const sampleData = [
+          {
+            id: '1',
+            title: 'Ocean Waves',
+            description: 'Peaceful ocean sounds for deep relaxation',
+            category: 'Nature',
+            audio_url: 'https://www.soundjay.com/misc/sounds/ocean-wave-1.wav',
+            thumbnail_url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=300&fit=crop',
+            is_published: true,
+            sort_order: 1,
+            duration_seconds: 1800
+          },
+          {
+            id: '2',
+            title: 'Forest Rain',
+            description: 'Gentle rainfall in a peaceful forest',
+            category: 'Nature',
+            audio_url: 'https://www.soundjay.com/misc/sounds/rain-1.wav',
+            thumbnail_url: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop',
+            is_published: true,
+            sort_order: 2,
+            duration_seconds: 2400
+          },
+          {
+            id: '3',
+            title: 'White Noise',
+            description: 'Pure white noise for focus and concentration',
+            category: 'White Noise',
+            audio_url: 'https://www.soundjay.com/misc/sounds/white-noise-1.wav',
+            thumbnail_url: 'https://images.unsplash.com/photo-1518709414372-162cfbd45b3b?w=400&h=300&fit=crop',
+            is_published: true,
+            sort_order: 3,
+            duration_seconds: 3600
+          },
+          {
+            id: '4',
+            title: 'Meditation Bells',
+            description: 'Soft bells for meditation and mindfulness',
+            category: 'Focus',
+            audio_url: 'https://www.soundjay.com/misc/sounds/bell-1.wav',
+            thumbnail_url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop',
+            is_published: true,
+            sort_order: 4,
+            duration_seconds: 900
+          }
+        ];
+
+        return new NextResponse(JSON.stringify({
+          success: true,
+          data: sampleData.filter(s => s.is_published),
+          categories: ['Sleep', 'Nature', 'White Noise', 'Focus']
+        }), {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+      } catch (error) {
+        logger.error(error, 'Failed to fetch soundscapes data');
+        return new NextResponse(JSON.stringify({
+          success: false,
+          error: 'Failed to load soundscapes'
+        }), {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+      }
+    }
+  }
+}

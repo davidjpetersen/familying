@@ -74,7 +74,7 @@ export default function SoundscapesPage() {
   const fetchSoundscapes = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/soundscapes');
+      const response = await fetch('/app/soundscapes/api/data');
       const data: SoundscapesData = await response.json();
       
       if (data.success) {

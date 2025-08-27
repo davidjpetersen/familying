@@ -1,3 +1,5 @@
+import 'server-only'
+
 // Environment variable validation and configuration
 interface EnvConfig {
   NEXT_PUBLIC_SUPABASE_URL: string

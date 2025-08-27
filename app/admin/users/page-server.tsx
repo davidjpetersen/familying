@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { checkIsAdmin } from '@/lib/admin-adapter';
 import { checkIsAdminDirect } from '@/lib/admin-adapter-direct';
 import { AdminLayout } from '@/components/admin/AdminLayout';
-import { AdminUsersClient } from './AdminUsersClient';
+import AdminUsersClient from './AdminUsersClient';
 
 export default async function AdminUsersPage() {
   const { userId } = await auth();
@@ -24,7 +24,7 @@ export default async function AdminUsersPage() {
 
   return (
     <AdminLayout requireAuth={false}>
-      <AdminUsersClient currentAdmin={admin} />
+      <AdminUsersClient />
     </AdminLayout>
   );
 }

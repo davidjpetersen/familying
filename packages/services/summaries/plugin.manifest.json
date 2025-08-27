@@ -1,0 +1,21 @@
+{
+  "name": "summaries",
+  "displayName": "Book Summaries",
+  "version": "0.1.0",
+  "author": "David Petersen",
+  "description": "Enhanced book summaries of parenting classics",
+  "routes": {
+    "user": [
+      "/app/summaries",
+      "/app/summaries/:id"
+    ],
+    "admin": [
+      "/admin/summaries",
+      "/admin/summaries/settings"
+    ]
+  },
+  "migrations": [
+    "migrations/0001_init.sql"
+  ],
+  "configSchemaRef": "#config"
+}

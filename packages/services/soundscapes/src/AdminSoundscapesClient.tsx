@@ -58,7 +58,7 @@ const categoryIcons: Record<string, any> = {
   'Focus': Brain
 };
 
-export default function AdminSoundscapesPage() {
+export default function AdminSoundscapesClient() {
   const [soundscapes, setSoundscapes] = useState<Soundscape[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -83,7 +83,7 @@ export default function AdminSoundscapesPage() {
   const fetchSoundscapes = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/admin/soundscapes/api/soundscapes');
+      const response = await fetch('/api/soundscapes/soundscapes');
       const data = await response.json();
       
       if (data.success) {
@@ -142,7 +142,7 @@ export default function AdminSoundscapesPage() {
       setOperationLoading(editingId ? 'update' : 'create');
       
       const method = editingId ? 'PUT' : 'POST';
-      const url = editingId ? `/api/soundscapes/${editingId}` : '/api/soundscapes';
+      const url = editingId ? `/api/soundscapes/admin/${editingId}` : '/api/soundscapes/admin';
       
       const response = await fetch(url, {
         method,
@@ -176,7 +176,7 @@ export default function AdminSoundscapesPage() {
     try {
       setOperationLoading(id);
       
-      const response = await fetch(`/api/soundscapes/${id}`, {
+      const response = await fetch(`/api/soundscapes/admin/${id}`, {
         method: 'DELETE',
       });
 
@@ -198,7 +198,7 @@ export default function AdminSoundscapesPage() {
     try {
       setOperationLoading(soundscape.id);
       
-      const response = await fetch(`/api/soundscapes/${soundscape.id}`, {
+      const response = await fetch(`/api/soundscapes/admin/${soundscape.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
