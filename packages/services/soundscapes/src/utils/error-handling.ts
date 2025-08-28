@@ -56,9 +56,11 @@ export interface ApiSuccessResponse<T = any> {
   data: T
   meta?: {
     total?: number
+    count?: number
     page?: number
     limit?: number
     hasNext?: boolean
+    folders?: string[]
   }
 }
 
