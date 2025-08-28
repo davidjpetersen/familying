@@ -22,7 +22,11 @@ import {
   Radio, 
   Brain,
   Eye,
-  EyeOff
+  EyeOff,
+  CloudUpload,
+  CheckCircle,
+  XCircle,
+  Loader2
 } from 'lucide-react';
 
 interface Soundscape {
@@ -57,6 +61,270 @@ const categoryIcons: Record<string, any> = {
   'White Noise': Radio,
   'Focus': Brain
 };
+
+interface StorageFile {
+  id: string;
+  name: string;
+  fullPath: string;
+  folder: string;
+  size: number;
+  contentType: string;
+  lastModified: string;
+  publicUrl: string;
+  thumbnailUrl: string;
+}
+
+interface StorageImportDialogProps {
+  onImportComplete: () => void;
+}
+
+function StorageImportDialog({ onImportComplete }: StorageImportDialogProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [storageFiles, setStorageFiles] = useState<StorageFile[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importResults, setImportResults] = useState<any>(null);
+  const [folderFilter, setFolderFilter] = useState<string>('all');
+  const [availableFolders, setAvailableFolders] = useState<string[]>([]);
+
+  const fetchStorageFiles = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/admin/soundscapes/storage');
+      const data = await response.json();
+      
+      if (data.success) {
+        setStorageFiles(data.data);
+        setAvailableFolders(data.folders || []);
+      } else {
+        alert('Failed to load storage files: ' + data.error);
+      }
+    } catch (error) {
+      alert('Failed to load storage files');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOpenDialog = () => {
+    setIsOpen(true);
+    setImportResults(null);
+    setFolderFilter('all');
+    setAvailableFolders([]);
+    fetchStorageFiles();
+  };
+
+  const handleCloseDialog = () => {
+    setIsOpen(false);
+    setSelectedFiles(new Set());
+    setImportResults(null);
+    setFolderFilter('all');
+  };
+
+  const toggleFileSelection = (fileId: string) => {
+    const newSelection = new Set(selectedFiles);
+    if (newSelection.has(fileId)) {
+      newSelection.delete(fileId);
+    } else {
+      newSelection.add(fileId);
+    }
+    setSelectedFiles(newSelection);
+  };
+
+  const handleImport = async () => {
+    if (selectedFiles.size === 0) {
+      alert('Please select at least one file to import');
+      return;
+    }
+
+    try {
+      setImporting(true);
+      const filesToImport = storageFiles.filter(file => selectedFiles.has(file.id));
+      
+      const response = await fetch('/api/admin/soundscapes/storage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ files: filesToImport }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setImportResults(data);
+        setSelectedFiles(new Set());
+        onImportComplete();
+      } else {
+        alert('Import failed: ' + data.error);
+      }
+    } catch (error) {
+      alert('Import failed');
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const filteredFiles = storageFiles.filter(file => 
+    folderFilter === 'all' || file.folder === folderFilter
+  );
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" onClick={handleOpenDialog}>
+          <CloudUpload className="mr-2 h-4 w-4" />
+          Import from Storage
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogHeader>
+          <DialogTitle>Import from Supabase Storage</DialogTitle>
+          <DialogDescription>
+            Select audio files from the plugin_soundscapes storage bucket to import as soundscapes.
+          </DialogDescription>
+        </DialogHeader>
+
+        {importResults && (
+          <Alert className="mb-4">
+            <CheckCircle className="h-4 w-4" />
+            <AlertDescription>
+              {importResults.message}
+              {importResults.summary && (
+                <div className="mt-2 text-sm">
+                  <div>Total: {importResults.summary.total}</div>
+                  <div>Successful: {importResults.summary.successful}</div>
+                  {importResults.summary.failed > 0 && (
+                    <div>Failed: {importResults.summary.failed}</div>
+                  )}
+                </div>
+              )}
+            </AlertDescription>
+          </Alert>
+        )}
+
+        <div className="flex-1 overflow-hidden flex flex-col">
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin mr-2" />
+              Loading storage files...
+            </div>
+          ) : (
+            <>
+              <div className="mb-4 flex items-center justify-between">
+                <div className="text-sm text-gray-600">
+                  Found {storageFiles.length} audio files in {availableFolders.length} folders
+                </div>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="folder-filter" className="text-sm">Filter by folder:</Label>
+                  <Select value={folderFilter} onValueChange={setFolderFilter}>
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue placeholder="All folders" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All folders</SelectItem>
+                      {availableFolders.map(folder => (
+                        <SelectItem key={folder} value={folder}>
+                          {folder === 'root' ? '📁 Root' : `📁 ${folder}`}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="mb-2 text-sm text-gray-500">
+                Showing {filteredFiles.length} files
+              </div>
+              <div className="flex-1 overflow-y-auto border rounded-lg">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-12">
+                        <input
+                          type="checkbox"
+                          checked={filteredFiles.length > 0 && filteredFiles.every(f => selectedFiles.has(f.id))}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedFiles(prev => new Set([...prev, ...filteredFiles.map(f => f.id)]));
+                            } else {
+                              setSelectedFiles(prev => {
+                                const newSet = new Set(prev);
+                                filteredFiles.forEach(f => newSet.delete(f.id));
+                                return newSet;
+                              });
+                            }
+                          }}
+                        />
+                      </TableHead>
+                      <TableHead>File Name</TableHead>
+                      <TableHead>Folder</TableHead>
+                      <TableHead>Size</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Modified</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredFiles.map((file) => (
+                      <TableRow key={file.id}>
+                        <TableCell>
+                          <input
+                            type="checkbox"
+                            checked={selectedFiles.has(file.id)}
+                            onChange={() => toggleFileSelection(file.id)}
+                          />
+                        </TableCell>
+                        <TableCell className="font-medium">{file.name}</TableCell>
+                        <TableCell>
+                          <span className="text-sm text-gray-500">
+                            {file.folder === 'root' ? '📁 Root' : `📁 ${file.folder}`}
+                          </span>
+                        </TableCell>
+                        <TableCell>{formatFileSize(file.size)}</TableCell>
+                        <TableCell>{file.contentType}</TableCell>
+                        <TableCell>{new Date(file.lastModified).toLocaleDateString()}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
+          )}
+        </div>
+
+        <DialogFooter className="mt-4">
+          <Button variant="outline" onClick={handleCloseDialog}>
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleImport}
+            disabled={selectedFiles.size === 0 || importing}
+          >
+            {importing ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Importing...
+              </>
+            ) : (
+              <>
+                <Upload className="mr-2 h-4 w-4" />
+                Import {selectedFiles.size} Selected
+              </>
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 export default function AdminSoundscapesPage() {
   const [soundscapes, setSoundscapes] = useState<Soundscape[]>([]);
@@ -241,10 +509,13 @@ export default function AdminSoundscapesPage() {
           <h1 className="text-3xl font-bold">Soundscapes Management</h1>
           <p className="text-gray-600 mt-2">Manage ambient sounds for family wellness</p>
         </div>
-        <Button onClick={openCreateDialog}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Soundscape
-        </Button>
+        <div className="flex gap-2">
+          <StorageImportDialog onImportComplete={fetchSoundscapes} />
+          <Button onClick={openCreateDialog}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Soundscape
+          </Button>
+        </div>
       </div>
 
       {error && (
