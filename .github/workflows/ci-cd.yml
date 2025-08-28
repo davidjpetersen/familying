@@ -1,0 +1,206 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      dry_run:
+        description: 'Run in dry-run mode (no actual migrations)'
+        required: false
+        default: false
+        type: boolean
+      fail_fast:
+        description: 'Stop on first migration failure'
+        required: false
+        default: true
+        type: boolean
+      rollback_ref:
+        description: 'Git ref to rollback to (for rollback operations)'
+        required: false
+        type: string
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  test:
+    name: 🧪 Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: |
+          npm ci
+          # Install dependencies for all plugins
+          find packages/services -name package.json -execdir npm ci \;
+
+      - name: 🧪 Run tests
+        run: |
+          npm run test
+          # Run plugin tests
+          find packages/services -name package.json -execdir npm test \;
+
+  migrate-staging:
+    name: 🗄️ Deploy to Staging
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    
+    environment:
+      name: staging
+      url: ${{ vars.STAGING_URL }}
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci
+
+      - name: 🗄️ Run database migrations
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.STAGING_SUPABASE_SERVICE_ROLE_KEY }}
+          CI_FAIL_FAST: 'true'
+        run: |
+          echo "🚀 Running migrations on staging environment..."
+          node scripts/migrate.mjs
+
+      - name: 🔍 Verify deployment
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.STAGING_SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          echo "🔍 Verifying migrations were applied correctly..."
+          node scripts/migrate.mjs --dry-run
+
+  migrate-production:
+    name: 🚀 Deploy to Production
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    environment:
+      name: production
+      url: ${{ vars.PRODUCTION_URL }}
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci
+
+      - name: 🔍 Dry run migrations (safety check)
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.PRODUCTION_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.PRODUCTION_SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          echo "🔍 Checking what migrations would be applied to production..."
+          node scripts/migrate.mjs --dry-run
+
+      - name: 🗄️ Run database migrations
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.PRODUCTION_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.PRODUCTION_SUPABASE_SERVICE_ROLE_KEY }}
+          CI_FAIL_FAST: 'true'
+        run: |
+          echo "🚀 Running migrations on production environment..."
+          node scripts/migrate.mjs
+
+      - name: 🔍 Post-deployment verification
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.PRODUCTION_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.PRODUCTION_SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          echo "✅ Verifying all migrations completed successfully..."
+          node scripts/migrate.mjs --dry-run
+
+  rollback:
+    name: 🔄 Rollback (Manual Trigger)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    
+    environment:
+      name: ${{ github.event.inputs.environment }}
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.rollback_ref }}
+
+      - name: ⚠️ Rollback Warning
+        run: |
+          echo "⚠️  ROLLBACK OPERATION INITIATED"
+          echo "Environment: ${{ github.event.inputs.environment }}"
+          echo "Rolling back to: ${{ github.event.inputs.rollback_ref }}"
+          echo "Note: Only application code is rolled back. Database migrations are irreversible."
+          echo "Manual intervention may be required for database rollbacks."
+
+  manual-migrate:
+    name: 🔧 Manual Migration (Manual Trigger)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    
+    environment:
+      name: ${{ github.event.inputs.environment || 'staging' }}
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci
+
+      - name: 🗄️ Run migrations
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ github.event.inputs.environment == 'production' && secrets.PRODUCTION_SUPABASE_URL || secrets.STAGING_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ github.event.inputs.environment == 'production' && secrets.PRODUCTION_SUPABASE_SERVICE_ROLE_KEY || secrets.STAGING_SUPABASE_SERVICE_ROLE_KEY }}
+          CI_FAIL_FAST: ${{ github.event.inputs.fail_fast || 'true' }}
+        run: |
+          if [[ "${{ github.event.inputs.dry_run }}" == "true" ]]; then
+            echo "🔍 Running in dry-run mode..."
+            node scripts/migrate.mjs --dry-run
+          else
+            echo "🚀 Running migrations..."
+            node scripts/migrate.mjs
+          fi
