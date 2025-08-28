@@ -351,7 +351,7 @@ export default function AdminSoundscapesClient() {
           </Table>
 
           {soundscapes.length === 0 && (
-            <div className="text-center py-8">
+            <div className="text-center">
               <Radio className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-600 mb-2">No soundscapes yet</h3>
               <p className="text-gray-500 mb-4">Create your first ambient sound to get started.</p>

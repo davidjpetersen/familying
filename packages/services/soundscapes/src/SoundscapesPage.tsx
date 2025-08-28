@@ -74,7 +74,7 @@ export default function SoundscapesPage() {
   const fetchSoundscapes = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/app/soundscapes/api/data');
+      const response = await fetch('/api/soundscapes/data');
       const data: SoundscapesData = await response.json();
       
       if (data.success) {
@@ -205,7 +205,7 @@ export default function SoundscapesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -312,7 +312,7 @@ export default function SoundscapesPage() {
                     <Card 
                       key={soundscape.id}
                       className={cn(
-                        "group cursor-pointer transition-all hover:shadow-lg bg-white/80 backdrop-blur-sm",
+                        "group cursor-pointer transition-all hover:shadow-lg bg-white/80 backdrop-blur-sm py-0",
                         currentSound?.id === soundscape.id && "ring-2 ring-primary"
                       )}
                       onClick={() => playSound(soundscape)}
@@ -370,3 +370,6 @@ export default function SoundscapesPage() {
     </div>
   );
 }
+
+// Export for plugin system
+export { SoundscapesPage as UserComponent };

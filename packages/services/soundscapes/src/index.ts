@@ -78,12 +78,135 @@ export async function register(ctx: PluginContext): Promise<PluginRoutes> {
   logger.info('Registering soundscapes plugin')
 
   return {
-    user: {},
-    admin: {},
+    user: {
+      'GET:/': async (request, context) => {
+        // This will be handled by the dynamic page component
+        return NextResponse.json({ success: true })
+      }
+    },
+    admin: {
+      'GET:/': async (request, context) => {
+        // This will be handled by the dynamic page component  
+        return NextResponse.json({ success: true })
+      },
+      'GET:/soundscapes': async (request, context) => {
+        try {
+          // Return all soundscapes for admin (including unpublished)
+          return NextResponse.json({
+            success: true,
+            data: sampleSoundscapes.sort((a, b) => a.sort_order - b.sort_order)
+          })
+        } catch (error) {
+          console.error('Error fetching admin soundscapes:', error)
+          return NextResponse.json({
+            success: false,
+            error: 'Failed to fetch soundscapes'
+          }, { status: 500 })
+        }
+      },
+      'POST:/soundscapes': async (request, context) => {
+        try {
+          const body = await request.json()
+          const newSoundscape: Soundscape = {
+            id: (Date.now() + Math.random()).toString(),
+            ...body,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }
+          
+          sampleSoundscapes.push(newSoundscape)
+          
+          return NextResponse.json({
+            success: true,
+            data: newSoundscape
+          })
+        } catch (error) {
+          console.error('Error creating soundscape:', error)
+          return NextResponse.json({
+            success: false,
+            error: 'Failed to create soundscape'
+          }, { status: 500 })
+        }
+      },
+      'PUT:/soundscapes/:id': async (request, context) => {
+        try {
+          const id = context.params.path.split('/').pop()
+          const body = await request.json()
+          
+          const index = sampleSoundscapes.findIndex(s => s.id === id)
+          if (index === -1) {
+            return NextResponse.json({
+              success: false,
+              error: 'Soundscape not found'
+            }, { status: 404 })
+          }
+          
+          sampleSoundscapes[index] = {
+            ...sampleSoundscapes[index],
+            ...body,
+            updated_at: new Date().toISOString()
+          }
+          
+          return NextResponse.json({
+            success: true,
+            data: sampleSoundscapes[index]
+          })
+        } catch (error) {
+          console.error('Error updating soundscape:', error)
+          return NextResponse.json({
+            success: false,
+            error: 'Failed to update soundscape'
+          }, { status: 500 })
+        }
+      },
+      'DELETE:/soundscapes/:id': async (request, context) => {
+        try {
+          const id = context.params.path.split('/').pop()
+          const index = sampleSoundscapes.findIndex(s => s.id === id)
+          
+          if (index === -1) {
+            return NextResponse.json({
+              success: false,
+              error: 'Soundscape not found'
+            }, { status: 404 })
+          }
+          
+          const deleted = sampleSoundscapes.splice(index, 1)[0]
+          
+          return NextResponse.json({
+            success: true,
+            data: deleted
+          })
+        } catch (error) {
+          console.error('Error deleting soundscape:', error)
+          return NextResponse.json({
+            success: false,
+            error: 'Failed to delete soundscape'
+          }, { status: 500 })
+        }
+      }
+    },
     api: {
       'GET:/data': async (request, context) => {
         try {
           // Filter to only published soundscapes for users
+          const publishedSoundscapes = sampleSoundscapes.filter(s => s.is_published)
+          
+          return NextResponse.json({
+            success: true,
+            data: publishedSoundscapes.sort((a, b) => a.sort_order - b.sort_order)
+          })
+        } catch (error) {
+          console.error('Error fetching soundscapes:', error)
+          return NextResponse.json({
+            success: false,
+            error: 'Failed to fetch soundscapes'
+          }, { status: 500 })
+        }
+      },
+      'GET:/soundscapes': async (request, context) => {
+        try {
+          // Return published soundscapes for public API
           const publishedSoundscapes = sampleSoundscapes.filter(s => s.is_published)
           
           return NextResponse.json({

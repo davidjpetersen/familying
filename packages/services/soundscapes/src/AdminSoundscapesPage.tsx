@@ -83,7 +83,7 @@ export default function AdminSoundscapesPage() {
   const fetchSoundscapes = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/admin/soundscapes/api/soundscapes');
+      const response = await fetch('/api/admin/plugins/soundscapes/soundscapes');
       const data = await response.json();
       
       if (data.success) {
@@ -142,7 +142,7 @@ export default function AdminSoundscapesPage() {
       setOperationLoading(editingId ? 'update' : 'create');
       
       const method = editingId ? 'PUT' : 'POST';
-      const url = editingId ? `/api/soundscapes/${editingId}` : '/api/soundscapes';
+      const url = editingId ? `/api/admin/plugins/soundscapes/soundscapes/${editingId}` : '/api/admin/plugins/soundscapes/soundscapes';
       
       const response = await fetch(url, {
         method,
@@ -176,7 +176,7 @@ export default function AdminSoundscapesPage() {
     try {
       setOperationLoading(id);
       
-      const response = await fetch(`/api/soundscapes/${id}`, {
+      const response = await fetch(`/api/admin/plugins/soundscapes/soundscapes/${id}`, {
         method: 'DELETE',
       });
 
@@ -198,7 +198,7 @@ export default function AdminSoundscapesPage() {
     try {
       setOperationLoading(soundscape.id);
       
-      const response = await fetch(`/api/soundscapes/${soundscape.id}`, {
+      const response = await fetch(`/api/admin/plugins/soundscapes/soundscapes/${soundscape.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -480,3 +480,6 @@ export default function AdminSoundscapesPage() {
     </div>
   );
 }
+
+// Export for plugin system  
+export { AdminSoundscapesPage as AdminComponent };
