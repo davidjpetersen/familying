@@ -4,4 +4,8 @@ packages:
 
 onlyBuiltDependencies:
   - '@clerk/shared'
+  - '@tailwindcss/oxide'
   - esbuild
+  - protobufjs
+  - sharp
+  - unrs-resolver
