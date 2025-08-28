@@ -4,33 +4,72 @@ import { validateRequestBody } from '../validation/middleware'
 import { StorageImportSchema, type StorageImportInput } from '../validation/schemas'
 import { ErrorResponses, createSuccessResponse, handleApiError } from '../utils/error-handling'
 
-async function getAllFilesRecursively(bucket: string, path = '', allFiles: any[] = []): Promise<any[]> {
-  const { data: files, error } = await supabaseAdmin.storage
-    .from(bucket)
-    .list(path, {
-      limit: 1000,
-      offset: 0,
-      sortBy: { column: 'name', order: 'asc' }
-    })
-
-  if (error) {
-    console.error(`Error listing files in path ${path}:`, error)
+async function getAllFilesRecursively(
+  bucket: string, 
+  path = '', 
+  allFiles: any[] = [], 
+  depth = 0, 
+  maxDepth = 10,
+  visitedPaths = new Set<string>()
+): Promise<any[]> {
+  // Prevent infinite recursion and loops
+  if (depth >= maxDepth) {
+    console.warn(`Max depth ${maxDepth} reached for path: ${path}`)
     return allFiles
   }
 
-  for (const file of files || []) {
-    const fullPath = path ? `${path}/${file.name}` : file.name
+  const fullPath = path ? `${bucket}/${path}` : bucket
+  if (visitedPaths.has(fullPath)) {
+    console.warn(`Circular reference detected, skipping: ${fullPath}`)
+    return allFiles
+  }
+  visitedPaths.add(fullPath)
 
-    if (file.metadata === null) {
-      // This is a folder, recurse into it
-      await getAllFilesRecursively(bucket, fullPath, allFiles)
-    } else {
-      // This is a file, add it to our list with full path
-      allFiles.push({
-        ...file,
-        fullPath,
-        folder: path || 'root'
+  // Use paginated approach instead of single request with limit
+  let hasMore = true
+  let offset = 0
+  const pageSize = 100
+
+  while (hasMore) {
+    const { data: files, error } = await supabaseAdmin.storage
+      .from(bucket)
+      .list(path, {
+        limit: pageSize,
+        offset,
+        sortBy: { column: 'name', order: 'asc' }
       })
+
+    if (error) {
+      console.error(`Error listing files in path ${path}:`, error)
+      return allFiles
+    }
+
+    if (!files || files.length === 0) {
+      hasMore = false
+      break
+    }
+
+    for (const file of files) {
+      const fullPath = path ? `${path}/${file.name}` : file.name
+
+      if (file.metadata === null) {
+        // This is a folder, recurse into it
+        await getAllFilesRecursively(bucket, fullPath, allFiles, depth + 1, maxDepth, visitedPaths)
+      } else {
+        // This is a file, add it to our list with full path
+        allFiles.push({
+          ...file,
+          fullPath,
+          folder: path || 'root'
+        })
+      }
+    }
+
+    // Check if we got fewer results than requested (end of pagination)
+    if (files.length < pageSize) {
+      hasMore = false
+    } else {
+      offset += pageSize
     }
   }
 
@@ -114,12 +153,18 @@ export async function importStorageFiles(request: NextRequest) {
     
     for (const filePath of files) {
       try {
-        // Get file details from storage
-        const { data: fileData, error: fileError } = await supabaseAdmin.storage
-          .from('plugin_soundscapes')
-          .list('', { search: filePath })
+        // Check file existence by attempting to get file listing in directory
+        const pathParts = filePath.split('/')
+        const fileName = pathParts[pathParts.length - 1]
+        const folderPath = pathParts.slice(0, -1).join('/')
 
-        if (fileError || !fileData || fileData.length === 0) {
+        const { data: info, error: infoError } = await supabaseAdmin.storage
+          .from('plugin_soundscapes')
+          .list(folderPath, {
+            search: fileName
+          })
+
+        if (infoError || !info || info.length === 0) {
           results.push({
             file: filePath,
             success: false,
@@ -128,10 +173,15 @@ export async function importStorageFiles(request: NextRequest) {
           continue
         }
 
-        const file = fileData[0]
-        const pathParts = filePath.split('/')
-        const fileName = pathParts[pathParts.length - 1]
-        const folderPath = pathParts.slice(0, -1).join('/') || 'root'
+        const file = info.find(f => f.name === fileName)
+        if (!file) {
+          results.push({
+            file: filePath,
+            success: false,
+            error: 'File not found in storage'
+          })
+          continue
+        }
 
         // Determine category based on filename and folder path
         const fileNameLower = fileName.toLowerCase()
@@ -163,12 +213,39 @@ export async function importStorageFiles(request: NextRequest) {
           .from('plugin_soundscapes')
           .getPublicUrl(filePath)
 
+        // Generate a unique title
+        const baseTitle = fileName
+          .replace(/\.[^/.]+$/, "") // Remove extension
+          .replace(/[-_]/g, ' ') // Replace hyphens and underscores with spaces
+          .replace(/\b\w/g, (l: string) => l.toUpperCase()) // Title case
+
+        // Include folder path for uniqueness
+        const titleWithPath = folderPath !== 'root' 
+          ? `${folderPath.split('/').map(p => p.replace(/[-_]/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())).join(' / ')} / ${baseTitle}`
+          : baseTitle
+
+        // Generate unique title by checking for collisions
+        let uniqueTitle = titleWithPath
+        let counter = 1
+        while (true) {
+          const { data: existingData } = await supabaseAdmin
+            .from('soundscapes')
+            .select('id')
+            .eq('title', uniqueTitle)
+            .single()
+
+          if (!existingData) {
+            break // Title is unique
+          }
+
+          // Generate next variant
+          uniqueTitle = `${titleWithPath} (${counter})`
+          counter++
+        }
+
         // Create soundscape entry
         const soundscapeData = {
-          title: fileName
-            .replace(/\.[^/.]+$/, "") // Remove extension
-            .replace(/[-_]/g, ' ') // Replace hyphens and underscores with spaces
-            .replace(/\b\w/g, (l: string) => l.toUpperCase()), // Title case
+          title: uniqueTitle,
           description: `Imported from storage: ${filePath}${folderPath !== 'root' ? ` (${folderPath})` : ''}`,
           category,
           audio_url: urlData.publicUrl,
@@ -176,23 +253,6 @@ export async function importStorageFiles(request: NextRequest) {
           is_published: false, // Import as draft by default
           sort_order: 0,
           duration_seconds: null
-        }
-
-        // Check if soundscape already exists by title
-        const { data: existingData } = await supabaseAdmin
-          .from('soundscapes')
-          .select('id, title')
-          .eq('title', soundscapeData.title)
-          .single()
-
-        if (existingData) {
-          results.push({
-            file: filePath,
-            success: false,
-            error: 'Soundscape with this title already exists',
-            existing: existingData
-          })
-          continue
         }
 
         // Insert into database

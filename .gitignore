@@ -19,6 +19,13 @@ packages/services/*/*.tsbuildinfo
 
 # testing
 /coverage
+**/coverage/
+**/lcov-report/
+packages/services/soundscapes/coverage/
+**/.nyc_output/
+**/clover.xml
+**/lcov.info
+**/coverage-final.json
 
 # next.js
 /.next/

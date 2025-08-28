@@ -67,7 +67,7 @@ describe('Storage API Integration', () => {
       
       expect(response.status).toBe(200)
       expect(mockListFn).toHaveBeenCalledWith('', {
-        limit: 1000,
+        limit: 100,
         offset: 0,
         sortBy: { column: 'name', order: 'asc' }
       })
@@ -114,7 +114,15 @@ describe('Storage API Integration', () => {
       const response = await getStorageFiles(mockRequest)
       
       expect(response.status).toBe(200)
-      // Should only return audio files (mp3), not PDF
+      
+      // Parse response body and assert filtered content
+      const responseBody = await response.json()
+      expect(responseBody.data).toHaveLength(1)
+      expect(responseBody.data[0].name).toBe('test.mp3')
+      expect(responseBody.data[0].contentType).toBe('audio/mpeg')
+      
+      // Ensure PDF was filtered out
+      expect(responseBody.data.find((file: any) => file.name === 'document.pdf')).toBeUndefined()
     })
   })
 

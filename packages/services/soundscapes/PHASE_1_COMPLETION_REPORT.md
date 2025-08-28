@@ -90,12 +90,25 @@ export const StorageImportSchema = z.object({
 ```typescript
 // Centralized error responses with request tracking
 export const ErrorResponses = {
-  ValidationError: (details: string) => ({
-    error: 'VALIDATION_ERROR',
-    message: 'Request validation failed',
-    details
-  })
+  validation: (message: string, details?: any, path?: string, method?: string) =>
+    createErrorResponse(ERROR_CODES.VALIDATION_ERROR, message, details, 400, path, method)
 }
+
+// Example usage and response:
+const validationError = ErrorResponses.validation('Invalid soundscape data', { field: 'title' }, '/api/soundscapes', 'POST')
+// Returns NextResponse with status 400 and body:
+// {
+//   "success": false,
+//   "error": {
+//     "code": "VALIDATION_ERROR",
+//     "message": "Invalid soundscape data", 
+//     "details": { "field": "title" },
+//     "timestamp": "2025-08-28T16:42:04.818Z",
+//     "requestId": "uuid-v4-string",
+//     "path": "/api/soundscapes",
+//     "method": "POST"
+//   }
+// }
 ```
 
 ### 3. Enhanced API Layer

@@ -17,8 +17,14 @@ export const CreateSoundscapeSchema = z.object({
   audio_url: z.string()
     .url('Must be a valid URL')
     .refine((url) => {
-      const audioExtensions = ['.mp3', '.wav', '.ogg', '.m4a', '.aac', '.flac']
-      return audioExtensions.some(ext => url.toLowerCase().includes(ext))
+      try {
+        const urlObj = new URL(url)
+        const pathname = urlObj.pathname.toLowerCase()
+        const audioExtensions = ['.mp3', '.wav', '.ogg', '.m4a', '.aac', '.flac']
+        return audioExtensions.some(ext => pathname.endsWith(ext))
+      } catch {
+        return false
+      }
     }, 'Must be a valid audio file URL'),
   thumbnail_url: z.string()
     .url('Must be a valid URL')

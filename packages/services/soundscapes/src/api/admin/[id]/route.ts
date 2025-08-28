@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { checkIsAdmin } from '@/lib/admin-adapter';
 import { checkIsAdminDirect } from '@/lib/admin-adapter-direct';
+import { validateParams, validateRequestBody, createValidationErrorResponse } from '../../../validation/middleware';
+import { IdParamSchema, UpdateSoundscapeSchema } from '../../../validation/schemas';
 
 // Sample data for soundscapes (in a real app, this would be in a database)
 const sampleSoundscapes = [
@@ -80,7 +82,7 @@ async function verifyAdminAccess() {
 // PUT - Update soundscape
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
     const admin = await verifyAdminAccess();
@@ -88,26 +90,29 @@ export async function PUT(
       return NextResponse.json({ success: false, error: 'Admin access required' }, { status: 403 });
     }
 
-    const resolvedParams = await params;
-    const { id } = resolvedParams;
-    const body = await request.json();
-    const { title, description, category, audio_url, thumbnail_url, is_published, sort_order } = body;
+    // Validate params
+    const paramsValidation = validateParams(params, IdParamSchema);
+    if (!paramsValidation.success) {
+      return createValidationErrorResponse(paramsValidation);
+    }
+    const { id } = paramsValidation.data;
+
+    // Validate request body
+    const bodyValidation = await validateRequestBody(request, UpdateSoundscapeSchema);
+    if (!bodyValidation.success) {
+      return createValidationErrorResponse(bodyValidation);
+    }
+    const bodyData = bodyValidation.data;
 
     const soundscapeIndex = soundscapes.findIndex(s => s.id === id);
     if (soundscapeIndex === -1) {
       return NextResponse.json({ success: false, error: 'Soundscape not found' }, { status: 404 });
     }
 
-    // Update the soundscape
+    // Update the soundscape using validated data
     const updatedSoundscape = {
       ...soundscapes[soundscapeIndex],
-      title: title || soundscapes[soundscapeIndex].title,
-      description: description !== undefined ? description : soundscapes[soundscapeIndex].description,
-      category: category || soundscapes[soundscapeIndex].category,
-      audio_url: audio_url || soundscapes[soundscapeIndex].audio_url,
-      thumbnail_url: thumbnail_url || soundscapes[soundscapeIndex].thumbnail_url,
-      is_published: is_published !== undefined ? is_published : soundscapes[soundscapeIndex].is_published,
-      sort_order: sort_order !== undefined ? sort_order : soundscapes[soundscapeIndex].sort_order,
+      ...bodyData,
       updated_at: new Date().toISOString()
     };
 
@@ -126,7 +131,7 @@ export async function PUT(
 // DELETE - Delete soundscape
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
     const admin = await verifyAdminAccess();
@@ -134,8 +139,12 @@ export async function DELETE(
       return NextResponse.json({ success: false, error: 'Admin access required' }, { status: 403 });
     }
 
-    const resolvedParams = await params;
-    const { id } = resolvedParams;
+    // Validate params
+    const paramsValidation = validateParams(params, IdParamSchema);
+    if (!paramsValidation.success) {
+      return createValidationErrorResponse(paramsValidation);
+    }
+    const { id } = paramsValidation.data;
     
     const soundscapeIndex = soundscapes.findIndex(s => s.id === id);
     if (soundscapeIndex === -1) {

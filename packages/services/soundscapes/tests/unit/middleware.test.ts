@@ -50,7 +50,7 @@ describe('Validation Middleware', () => {
     it('should handle malformed JSON', async () => {
       const mockRequest = {
         json: async () => {
-          throw new Error('Unexpected token')
+          throw new SyntaxError('Unexpected token in JSON')
         }
       } as any
 

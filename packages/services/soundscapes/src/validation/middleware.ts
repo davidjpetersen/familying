@@ -54,13 +54,27 @@ export async function validateRequestBody<T>(
       }
     }
     
-    // Handle JSON parsing errors
+    // Handle JSON parsing errors and other unknown errors
+    if (error instanceof SyntaxError || (error as any)?.message?.includes('JSON')) {
+      return {
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Invalid JSON in request body',
+          details: [{ field: 'body', message: 'Malformed JSON' }],
+          timestamp: new Date().toISOString(),
+          requestId: crypto.randomUUID()
+        }
+      }
+    }
+
+    // Handle other unknown validation errors  
     return {
       success: false,
       error: {
         code: 'VALIDATION_ERROR',
-        message: 'Invalid JSON in request body',
-        details: [{ field: 'body', message: 'Malformed JSON' }],
+        message: 'Unknown validation error',
+        details: [{ field: 'body', message: 'Validation failed due to unknown error' }],
         timestamp: new Date().toISOString(),
         requestId: crypto.randomUUID()
       }

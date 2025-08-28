@@ -1,10 +1,12 @@
-import {
-  createErrorResponse,
-  createSuccessResponse,
-  ErrorResponses,
+import { 
+  createErrorResponse, 
+  createSuccessResponse, 
+  ErrorResponses, 
   handleApiError,
-  ERROR_CODES
+  withErrorHandling,
+  ERROR_CODES 
 } from '../../src/utils/error-handling'
+import type { NextRequest } from 'next/server'
 
 describe('Error Handling', () => {
   describe('createErrorResponse', () => {
@@ -46,12 +48,18 @@ describe('Error Handling', () => {
       expect(response.status).toBe(201)
     })
 
-    it('should include meta information', () => {
+    it('should include meta information', async () => {
       const testData = ['item1', 'item2']
       const meta = { count: 2, total: 10 }
       const response = createSuccessResponse(testData, meta)
 
       expect(response.status).toBe(200)
+      
+      // Parse response body and assert envelope shape
+      const responseBody = await response.json()
+      expect(responseBody.data).toEqual(testData)
+      expect(responseBody.meta).toEqual(meta)
+      expect(responseBody.success).toBe(true)
     })
   })
 
@@ -89,6 +97,80 @@ describe('Error Handling', () => {
     it('should create internal error', () => {
       const response = ErrorResponses.internal()
       expect(response.status).toBe(500)
+    })
+
+    it('should create admin required error', () => {
+      const response = ErrorResponses.adminRequired()
+      expect(response.status).toBe(403)
+    })
+
+    it('should create already exists error', () => {
+      const response = ErrorResponses.alreadyExists('Resource')
+      expect(response.status).toBe(409)
+    })
+
+    it('should create rate limited error', () => {
+      const response = ErrorResponses.rateLimited()
+      expect(response.status).toBe(429)
+    })
+
+    it('should create service unavailable error', () => {
+      const response = ErrorResponses.serviceUnavailable()
+      expect(response.status).toBe(503)
+    })
+  })
+
+  describe('withErrorHandling wrapper', () => {
+    it('should convert thrown errors into standardized responses with requestId', async () => {
+      const testError = new Error('Test error')
+      const mockHandler = jest.fn().mockRejectedValue(testError)
+      
+      const mockRequest = {
+        url: 'https://example.com/api/test',
+        method: 'POST',
+        headers: new Headers({ 'x-request-id': 'test-request-id' })
+      } as NextRequest
+
+      const wrappedHandler = withErrorHandling(mockHandler, '/api/test', 'POST')
+      const response = await wrappedHandler(mockRequest)
+
+      expect(response.status).toBe(500)
+      const responseBody = await response.json()
+      expect(responseBody.success).toBe(false)
+      expect(responseBody.error.code).toBe(ERROR_CODES.INTERNAL_ERROR)
+      expect(responseBody.error.requestId).toBeDefined()
+      expect(responseBody.error.path).toBe('/api/test')
+      expect(responseBody.error.method).toBe('POST')
+    })
+
+    it('should handle non-error throws and normalize to standardized response', async () => {
+      const mockHandler = jest.fn().mockRejectedValue('string error')
+      
+      const mockRequest = {
+        url: 'https://example.com/api/test',
+        method: 'GET'
+      } as NextRequest
+
+      const wrappedHandler = withErrorHandling(mockHandler, '/api/test', 'GET')
+      const response = await wrappedHandler(mockRequest)
+
+      expect(response.status).toBe(500)
+      const responseBody = await response.json()
+      expect(responseBody.success).toBe(false)
+      expect(responseBody.error.code).toBe(ERROR_CODES.INTERNAL_ERROR)
+      expect(responseBody.error.requestId).toBeDefined()
+    })
+
+    it('should pass through successful responses unchanged', async () => {
+      const successResponse = createSuccessResponse({ test: 'data' })
+      const mockHandler = jest.fn().mockResolvedValue(successResponse)
+      
+      const mockRequest = {} as NextRequest
+      const wrappedHandler = withErrorHandling(mockHandler)
+      const response = await wrappedHandler(mockRequest)
+
+      expect(response).toBe(successResponse)
+      expect(response.status).toBe(200)
     })
   })
 
