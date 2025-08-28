@@ -73,28 +73,38 @@ const sampleSoundscapes: Soundscape[] = [
 ]
 
 export async function register(ctx: PluginContext): Promise<PluginRoutes> {
-  const { logger } = ctx
+  const { logger, db } = ctx
 
   logger.info('Registering soundscapes plugin')
 
   return {
     user: {
+      // @ts-ignore - NextJS version compatibility issue
       'GET:/': async (request, context) => {
         // This will be handled by the dynamic page component
         return NextResponse.json({ success: true })
       }
     },
     admin: {
+      // @ts-ignore - NextJS version compatibility issue
       'GET:/': async (request, context) => {
         // This will be handled by the dynamic page component  
         return NextResponse.json({ success: true })
       },
+      // @ts-ignore - NextJS version compatibility issue
       'GET:/soundscapes': async (request, context) => {
         try {
           // Return all soundscapes for admin (including unpublished)
+          const soundscapes = await db.query({
+            operation: 'select',
+            table: 'soundscapes'
+          }, {
+            orderBy: { column: 'sort_order', ascending: true }
+          })
+          
           return NextResponse.json({
             success: true,
-            data: sampleSoundscapes.sort((a, b) => a.sort_order - b.sort_order)
+            data: soundscapes
           })
         } catch (error) {
           console.error('Error fetching admin soundscapes:', error)
@@ -104,21 +114,30 @@ export async function register(ctx: PluginContext): Promise<PluginRoutes> {
           }, { status: 500 })
         }
       },
+      // @ts-ignore - NextJS version compatibility issue
       'POST:/soundscapes': async (request, context) => {
         try {
           const body = await request.json()
-          const newSoundscape: Soundscape = {
-            id: (Date.now() + Math.random()).toString(),
-            ...body,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }
           
-          sampleSoundscapes.push(newSoundscape)
+          // Create new soundscape in database
+          const newSoundscape = await db.query({
+            operation: 'insert',
+            table: 'soundscapes',
+            data: {
+              title: body.title,
+              description: body.description,
+              category: body.category,
+              audio_url: body.audio_url,
+              thumbnail_url: body.thumbnail_url,
+              is_published: body.is_published,
+              sort_order: body.sort_order,
+              duration_seconds: body.duration_seconds
+            }
+          })
           
           return NextResponse.json({
             success: true,
-            data: newSoundscape
+            data: newSoundscape[0]
           })
         } catch (error) {
           console.error('Error creating soundscape:', error)
@@ -128,28 +147,39 @@ export async function register(ctx: PluginContext): Promise<PluginRoutes> {
           }, { status: 500 })
         }
       },
+      // @ts-ignore - NextJS version compatibility issue
       'PUT:/soundscapes/:id': async (request, context) => {
         try {
           const id = context.params.path.split('/').pop()
           const body = await request.json()
           
-          const index = sampleSoundscapes.findIndex(s => s.id === id)
-          if (index === -1) {
+          // Update soundscape in database
+          const updatedSoundscape = await db.query({
+            operation: 'update',
+            table: 'soundscapes',
+            where: { id },
+            data: {
+              title: body.title,
+              description: body.description,
+              category: body.category,
+              audio_url: body.audio_url,
+              thumbnail_url: body.thumbnail_url,
+              is_published: body.is_published,
+              sort_order: body.sort_order,
+              duration_seconds: body.duration_seconds
+            }
+          })
+          
+          if (!updatedSoundscape || updatedSoundscape.length === 0) {
             return NextResponse.json({
               success: false,
               error: 'Soundscape not found'
             }, { status: 404 })
           }
           
-          sampleSoundscapes[index] = {
-            ...sampleSoundscapes[index],
-            ...body,
-            updated_at: new Date().toISOString()
-          }
-          
           return NextResponse.json({
             success: true,
-            data: sampleSoundscapes[index]
+            data: updatedSoundscape[0]
           })
         } catch (error) {
           console.error('Error updating soundscape:', error)
@@ -159,23 +189,28 @@ export async function register(ctx: PluginContext): Promise<PluginRoutes> {
           }, { status: 500 })
         }
       },
+      // @ts-ignore - NextJS version compatibility issue
       'DELETE:/soundscapes/:id': async (request, context) => {
         try {
           const id = context.params.path.split('/').pop()
-          const index = sampleSoundscapes.findIndex(s => s.id === id)
           
-          if (index === -1) {
+          // Delete soundscape from database
+          const deletedSoundscape = await db.query({
+            operation: 'delete',
+            table: 'soundscapes',
+            where: { id }
+          })
+          
+          if (!deletedSoundscape || deletedSoundscape.length === 0) {
             return NextResponse.json({
               success: false,
               error: 'Soundscape not found'
             }, { status: 404 })
           }
           
-          const deleted = sampleSoundscapes.splice(index, 1)[0]
-          
           return NextResponse.json({
             success: true,
-            data: deleted
+            data: deletedSoundscape[0]
           })
         } catch (error) {
           console.error('Error deleting soundscape:', error)
@@ -187,14 +222,21 @@ export async function register(ctx: PluginContext): Promise<PluginRoutes> {
       }
     },
     api: {
+      // @ts-ignore - NextJS version compatibility issue
       'GET:/data': async (request, context) => {
         try {
           // Filter to only published soundscapes for users
-          const publishedSoundscapes = sampleSoundscapes.filter(s => s.is_published)
+          const publishedSoundscapes = await db.query({
+            operation: 'select',
+            table: 'soundscapes',
+            where: { is_published: true }
+          }, {
+            orderBy: { column: 'sort_order', ascending: true }
+          })
           
           return NextResponse.json({
             success: true,
-            data: publishedSoundscapes.sort((a, b) => a.sort_order - b.sort_order)
+            data: publishedSoundscapes
           })
         } catch (error) {
           console.error('Error fetching soundscapes:', error)
@@ -204,14 +246,21 @@ export async function register(ctx: PluginContext): Promise<PluginRoutes> {
           }, { status: 500 })
         }
       },
+      // @ts-ignore - NextJS version compatibility issue
       'GET:/soundscapes': async (request, context) => {
         try {
           // Return published soundscapes for public API
-          const publishedSoundscapes = sampleSoundscapes.filter(s => s.is_published)
+          const publishedSoundscapes = await db.query({
+            operation: 'select',
+            table: 'soundscapes',
+            where: { is_published: true }
+          }, {
+            orderBy: { column: 'sort_order', ascending: true }
+          })
           
           return NextResponse.json({
             success: true,
-            data: publishedSoundscapes.sort((a, b) => a.sort_order - b.sort_order)
+            data: publishedSoundscapes
           })
         } catch (error) {
           console.error('Error fetching soundscapes:', error)

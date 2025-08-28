@@ -32,7 +32,7 @@ export async function AdminLayout({ children, requireAuth = true, hideNavbar = f
     return (
       <div className="min-h-screen bg-background">
         {!hideNavbar && <AdminNavbar userRole={admin.role} />}
-        <main className={hideNavbar ? "" : "container mx-auto px-4 py-6"}>
+        <main className={hideNavbar ? "" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"}>
           {children}
         </main>
       </div>
@@ -42,7 +42,7 @@ export async function AdminLayout({ children, requireAuth = true, hideNavbar = f
   return (
     <div className="min-h-screen bg-background">
       {!hideNavbar && <AdminNavbar />}
-      <main className={hideNavbar ? "" : "container mx-auto px-4 py-6"}>
+      <main className={hideNavbar ? "" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"}>
         {children}
       </main>
     </div>
