@@ -1,10 +1,14 @@
 import { SignIn } from "@clerk/nextjs";
+import { Navigation } from "@/app/components/marketing/layout/navigation";
 
 const SignInPage = () => {
   return (
-    <main className="flex justify-center items-center">
-      <SignIn />
-    </main>
+    <>
+      <Navigation />
+      <main className="flex justify-center items-center min-h-screen">
+        <SignIn />
+      </main>
+    </>
   );
 };
 

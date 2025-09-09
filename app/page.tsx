@@ -140,9 +140,11 @@ export default function Home() {
       <HeroSection content={heroContent} />
       <HowItWorksSection content={howItWorksContent} />
       <TestimonialsSection testimonials={mockTestimonials} />
-      <FreePreviewSection resources={mockResources} />
-      <DifferentiationSection />
-      <SocialProofSection />
+      <div id="features">
+        <FreePreviewSection resources={mockResources} />
+        <DifferentiationSection />
+        <SocialProofSection />
+      </div>
       <FinalCtaSection />
     </MarketingLayout>
   );

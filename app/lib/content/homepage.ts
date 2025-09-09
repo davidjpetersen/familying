@@ -214,34 +214,35 @@ export const homepageContent: MarketingContent = {
 };
 
 // Navigation items with availability status
-export const navigationItems = [
+export const publicNavigationItems = [
   {
-    id: "about",
-    label: "About",
-    href: "/about",
-    isAvailable: false, // Coming soon
-    isExternal: false,
-    order: 1,
-    accessLevel: "public" as const
-  },
-  {
-    id: "features", 
+    id: "features",
     label: "Features",
-    href: "/features",
-    isAvailable: false, // Coming soon
-    isExternal: false,
-    order: 2,
-    accessLevel: "public" as const
+    href: "/#features", // Link to features section on homepage
+    isAvailable: true,
+    isExternal: false
   },
   {
-    id: "book-summaries",
-    label: "Book Summaries", 
-    href: "/book-summaries",
-    isAvailable: false, // Coming soon
-    isExternal: false,
-    order: 3,
-    accessLevel: "public" as const
-  },
+    id: "subscribe",
+    label: "Subscribe",
+    href: "/subscription",
+    isAvailable: true,
+    isExternal: false
+  }
+];
+
+export const authenticatedNavigationItems = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    href: "/my-cookbook", // Using existing page as dashboard for now
+    isAvailable: true,
+    isExternal: false
+  }
+];
+
+// Legacy navigation items - keeping for backwards compatibility
+export const navigationItems = [
   {
     id: "subscribe",
     label: "Subscribe",

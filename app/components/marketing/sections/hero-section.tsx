@@ -15,12 +15,12 @@ export function HeroSection({ content, className }: HeroSectionProps) {
   return (
     <section 
       className={cn(
-        'bg-gradient-to-br from-purple-50 via-white to-blue-50 w-full py-20',
+        'bg-gradient-to-br from-purple-50 via-white to-blue-50 w-full pt-0 pb-20',
         className
       )}
       aria-labelledby="hero-heading"
     >
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Content */}
           <motion.div
