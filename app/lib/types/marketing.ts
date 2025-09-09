@@ -297,13 +297,26 @@ export interface ResourceCardProps {
   className?: string;
 }
 
+export interface ProcessStepProps {
+  step: ProcessStep;
+  isInView?: boolean;
+  delay?: number;
+  className?: string;
+}
+
+export interface AvatarProps {
+  avatar: Avatar;
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+}
+
 // Analytics and tracking interfaces
 export interface TrackingEvent {
   eventName: string;
   eventCategory: 'cta' | 'navigation' | 'engagement' | 'download';
   eventLabel?: string;
   eventValue?: number;
-  customProperties?: Record<string, any>;
+  customProperties?: Record<string, string | number | boolean>;
 }
 
 export interface PerformanceMetrics {

@@ -17,7 +17,12 @@ import {
   TestimonialItem,
   ResourcePreview,
   TrackingEvent,
-  AccessibilityAttributes
+  AccessibilityAttributes,
+  NavigationItem,
+  Avatar,
+  ProcessStep,
+  MarketingContent,
+  ValidationRule
 } from './types';
 
 // Base component interface

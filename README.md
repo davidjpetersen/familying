@@ -68,17 +68,3 @@ The example Supabase schema is provided in `supabase_schema.sql`.
 ## License
 
 MIT
-
-👉 **Authentication**: Secure user sign-up and sign-in with Clerk; Google authentication and many more.
-
-👉 **Billing & Subscriptions**: Easily manage plans, upgrades, and payment details.
-
-👉 **Code Reusability**: Leverage reusable components and a modular codebase for efficient development.
-
-👉 **Cross-Device Compatibility**: Fully responsive design that works seamlessly across all devices.
-
-👉 **Database Integration**: Uses Supabase for real-time data handling and storage needs.
-
-👉 **No opinionated UI**: Easily bring your own style to the app, without the need for removing leftover styles.
-
-👉 **Scalable Tech Stack**: Built with Next.js for a fast, production-ready web application that scales seamlessly.
