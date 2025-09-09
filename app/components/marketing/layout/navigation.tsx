@@ -12,18 +12,50 @@ import Link from 'next/link';
 import { SignedOut, SignInButton, SignedIn, UserButton } from "@clerk/nextjs";
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { publicNavigationItems, authenticatedNavigationItems } from '@/app/lib/content/homepage';
+
+const Logo = () => (
+  <>
+    <SignedOut>
+      <Link
+        href="/"
+        className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-200"
+        aria-label="Familying.org homepage"
+      >
+        <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+          <span className="text-white font-bold text-lg" aria-hidden="true">♥</span>
+        </div>
+        <span className="text-xl font-bold text-gray-900">Familying.org</span>
+      </Link>
+    </SignedOut>
+    <SignedIn>
+      <Link
+        href="/dashboard"
+        className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-200"
+        aria-label="Familying.org dashboard"
+      >
+        <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+          <span className="text-white font-bold text-lg" aria-hidden="true">♥</span>
+        </div>
+        <span className="text-xl font-bold text-gray-900">Familying.org</span>
+      </Link>
+    </SignedIn>
+  </>
+);
+
+const linkClass = cn(
+  'text-gray-600 hover:text-purple-600 transition-colors duration-200',
+  'font-medium px-3 py-2 rounded-md hover:bg-purple-50',
+  'focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2'
+);
+
+const mobileLinkClass = cn(
+  'block px-3 py-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50',
+  'rounded-md transition-colors duration-200 font-medium',
+  'focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2'
+);
 
 export function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-  
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
-  };
 
   return (
     <nav 
@@ -33,42 +65,14 @@ export function Navigation() {
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link
-            href="/"
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-200"
-            aria-label="Familying.org homepage"
-          >
-            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg" aria-hidden="true">♥</span>
-            </div>
-            <span className="text-xl font-bold text-gray-900">Familying.org</span>
-          </Link>
+          <Logo />
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            {/* Public Navigation (when signed out) */}
             <SignedOut>
-              <ul className="flex items-center gap-6" role="list">
-                {publicNavigationItems.map((item) => (
-                  <li key={item.id}>
-                    <Link
-                      href={item.href}
-                      className={cn(
-                        'text-gray-600 hover:text-purple-600 transition-colors duration-200',
-                        'font-medium px-3 py-2 rounded-md hover:bg-purple-50',
-                        'focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2'
-                      )}
-                      {...(item.isExternal && {
-                        target: '_blank',
-                        rel: 'noopener noreferrer'
-                      })}
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              <Link href="/subscription" className={linkClass}>
+                Subscribe
+              </Link>
               <SignInButton>
                 <Button variant="default" size="sm">
                   Login
@@ -76,24 +80,10 @@ export function Navigation() {
               </SignInButton>
             </SignedOut>
 
-            {/* Authenticated Navigation (when signed in) */}
             <SignedIn>
-              <ul className="flex items-center gap-6" role="list">
-                {authenticatedNavigationItems.map((item) => (
-                  <li key={item.id}>
-                    <Link
-                      href={item.href}
-                      className={cn(
-                        'text-gray-600 hover:text-purple-600 transition-colors duration-200',
-                        'font-medium px-3 py-2 rounded-md hover:bg-purple-50',
-                        'focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2'
-                      )}
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              <Link href="/dashboard" className={linkClass}>
+                Dashboard
+              </Link>
               <UserButton />
             </SignedIn>
           </div>
@@ -101,11 +91,8 @@ export function Navigation() {
           {/* Mobile menu button */}
           <button
             type="button"
-            className={cn(
-              'md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100',
-              'focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2'
-            )}
-            onClick={toggleMobileMenu}
+            className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-menu"
             aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
@@ -118,6 +105,7 @@ export function Navigation() {
           </button>
         </div>
       </div>
+      
       {/* Mobile Navigation */}
       <AnimatePresence>
         {isMobileMenuOpen && (
@@ -130,30 +118,10 @@ export function Navigation() {
             transition={{ duration: 0.2 }}
           >
             <div className="px-4 py-4 space-y-4">
-              {/* Public Navigation (when signed out) */}
               <SignedOut>
-                <ul className="space-y-2" role="list">
-                  {publicNavigationItems.map((item) => (
-                    <li key={item.id}>
-                      <Link
-                        href={item.href}
-                        className={cn(
-                          'block px-3 py-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50',
-                          'rounded-md transition-colors duration-200 font-medium',
-                          'focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2'
-                        )}
-                        onClick={closeMobileMenu}
-                        {...(item.isExternal && {
-                          target: '_blank',
-                          rel: 'noopener noreferrer'
-                        })}
-                      >
-                        {item.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-                
+                <Link href="/subscription" className={mobileLinkClass} onClick={() => setIsMobileMenuOpen(false)}>
+                  Subscribe
+                </Link>
                 <div className="pt-4 border-t border-gray-200">
                   <SignInButton>
                     <Button variant="default" className="w-full">
@@ -163,26 +131,10 @@ export function Navigation() {
                 </div>
               </SignedOut>
 
-              {/* Authenticated Navigation (when signed in) */}
               <SignedIn>
-                <ul className="space-y-2" role="list">
-                  {authenticatedNavigationItems.map((item) => (
-                    <li key={item.id}>
-                      <Link
-                        href={item.href}
-                        className={cn(
-                          'block px-3 py-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50',
-                          'rounded-md transition-colors duration-200 font-medium',
-                          'focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2'
-                        )}
-                        onClick={closeMobileMenu}
-                      >
-                        {item.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-                
+                <Link href="/my-cookbook" className={mobileLinkClass} onClick={() => setIsMobileMenuOpen(false)}>
+                  Dashboard
+                </Link>
                 <div className="pt-4 border-t border-gray-200 flex justify-center">
                   <UserButton />
                 </div>
