@@ -7,7 +7,7 @@ const Navbar = () => {
   return (
     <header className="flex justify-between items-center p-4 gap-4 h-16 max-w-7xl mx-auto">
       <Link href="/" className="text-2xl font-bold">
-        Recipe Emporium
+        Familying.org
       </Link>
       <div className="flex gap-4 items-center">
         <Link href="/recipes">Browse Recipes</Link>
