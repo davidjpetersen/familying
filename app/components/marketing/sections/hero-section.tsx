@@ -7,7 +7,7 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { cn } from '../../../../lib/utils';
+import { cn } from '@/lib/utils';
 import { CTAButton } from '../ui/cta-button';
 import type { HeroSectionProps } from '../../../lib/types/marketing';
 

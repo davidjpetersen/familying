@@ -13,7 +13,7 @@ import {
   CheckCircle,
   ArrowRight 
 } from 'lucide-react';
-import { cn } from '../../../../lib/utils';
+import { cn } from '@/lib/utils';
 import type { ProcessStepProps } from '../../../lib/types/marketing';
 
 // Icon mapping for process steps

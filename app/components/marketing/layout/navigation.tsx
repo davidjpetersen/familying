@@ -10,9 +10,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { SignedOut, SignInButton, SignedIn, UserButton } from "@clerk/nextjs";
-import { cn } from '../../../../lib/utils';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { publicNavigationItems, authenticatedNavigationItems } from '../../../lib/content/homepage';
+import { publicNavigationItems, authenticatedNavigationItems } from '@/app/lib/content/homepage';
 
 export function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -34,7 +34,7 @@ export function Navigation() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link 
+          <Link
             href="/"
             className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-200"
             aria-label="Familying.org homepage"
@@ -118,7 +118,6 @@ export function Navigation() {
           </button>
         </div>
       </div>
-      
       {/* Mobile Navigation */}
       <AnimatePresence>
         {isMobileMenuOpen && (

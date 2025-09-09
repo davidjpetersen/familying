@@ -8,7 +8,7 @@
 import { motion } from 'framer-motion';
 import { Download, Lock } from 'lucide-react';
 import Image from 'next/image';
-import { cn } from '../../../../lib/utils';
+import { cn } from '@/lib/utils';
 import type { ResourceCardProps } from '../../../lib/types/marketing';
 
 export function ResourceCard({ resource, onDownload, className }: ResourceCardProps) {
@@ -69,7 +69,6 @@ export function ResourceCard({ resource, onDownload, className }: ResourceCardPr
           </span>
         </div>
       </div>
-      
       {/* Content */}
       <div className="p-4">
         <h3 className="font-medium text-gray-900 mb-2 line-clamp-2">
@@ -130,7 +129,6 @@ export function ResourceCard({ resource, onDownload, className }: ResourceCardPr
           </div>
         )}
       </div>
-      
       {/* Screen reader context */}
       <div className="sr-only">
         Resource: {resource.title}. 

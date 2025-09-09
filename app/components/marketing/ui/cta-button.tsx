@@ -7,7 +7,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { cn } from '../../../../lib/utils';
+import { cn } from '@/lib/utils';
 import type { CTAButtonProps } from '../../../lib/types/marketing';
 import { ButtonVariant, ButtonSize } from '../../../lib/types/marketing';
 
@@ -109,7 +109,7 @@ export function CTAButton({ button, onClick, className }: CTAButtonProps) {
   // For internal links, wrap with Next.js Link
   if (!button.isExternal && !onClick) {
     return (
-      <Link href={button.href} passHref legacyBehavior>
+      <Link href={button.href}>
         {buttonContent}
       </Link>
     );

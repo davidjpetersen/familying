@@ -8,7 +8,7 @@
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
-import { cn } from '../../../../lib/utils';
+import { cn } from '@/lib/utils';
 import { ProcessStep } from '../ui/process-step';
 import type { HowItWorksSectionProps } from '../../../lib/types/marketing';
 
