@@ -1,46 +1,51 @@
 /**
- * Simplified Navigation Component
- * Shows different navigation based on authentication status
+ * Organization-Aware Navigation Component
+ * Shows different navigation based on authentication and organization status
  */
 
 'use client';
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Settings, Users, Home } from 'lucide-react';
 import Link from 'next/link';
 import { SignedOut, SignInButton, SignedIn, UserButton } from "@clerk/nextjs";
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { useOrganizationNavigation } from '../../../lib/hooks/useOrganizationNavigation';
 
-const Logo = () => (
-  <>
-    <SignedOut>
-      <Link
-        href="/"
-        className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-200"
-        aria-label="Familying.org homepage"
-      >
-        <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-          <span className="text-white font-bold text-lg" aria-hidden="true">♥</span>
-        </div>
-        <span className="text-xl font-bold text-gray-900">Familying.org</span>
-      </Link>
-    </SignedOut>
-    <SignedIn>
-      <Link
-        href="/dashboard"
-        className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-200"
-        aria-label="Familying.org dashboard"
-      >
-        <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-          <span className="text-white font-bold text-lg" aria-hidden="true">♥</span>
-        </div>
-        <span className="text-xl font-bold text-gray-900">Familying.org</span>
-      </Link>
-    </SignedIn>
-  </>
-);
+const Logo = () => {
+  const { hasOrganization, isLoaded } = useOrganizationNavigation();
+  
+  return (
+    <>
+      <SignedOut>
+        <Link
+          href="/"
+          className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-200"
+          aria-label="Familying.org homepage"
+        >
+          <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-lg" aria-hidden="true">♥</span>
+          </div>
+          <span className="text-xl font-bold text-gray-900">Familying.org</span>
+        </Link>
+      </SignedOut>
+      <SignedIn>
+        <Link
+          href={isLoaded && hasOrganization ? "/dashboard" : "/"}
+          className="flex items-center gap-2 hover:opacity-80 transition-opacity duration-200"
+          aria-label={isLoaded && hasOrganization ? "Familying.org dashboard" : "Familying.org homepage"}
+        >
+          <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-lg" aria-hidden="true">♥</span>
+          </div>
+          <span className="text-xl font-bold text-gray-900">Familying.org</span>
+        </Link>
+      </SignedIn>
+    </>
+  );
+};
 
 const linkClass = cn(
   'text-gray-600 hover:text-purple-600 transition-colors duration-200',
@@ -56,6 +61,7 @@ const mobileLinkClass = cn(
 
 export function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { hasOrganization, shouldShowCreateFamily, shouldShowFamilySettings, currentOrganization, isLoaded } = useOrganizationNavigation();
 
   return (
     <nav 
@@ -68,7 +74,7 @@ export function Navigation() {
           <Logo />
           
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-6">
             <SignedOut>
               <Link href="/subscription" className={linkClass}>
                 Subscribe
@@ -81,9 +87,34 @@ export function Navigation() {
             </SignedOut>
 
             <SignedIn>
-              <Link href="/dashboard" className={linkClass}>
-                Dashboard
-              </Link>
+              {isLoaded && (
+                <>
+                  {hasOrganization ? (
+                    <>
+                      <Link href="/dashboard" className={linkClass}>
+                        <Home className="w-4 h-4 mr-1" />
+                        Dashboard
+                      </Link>
+                      {shouldShowFamilySettings && (
+                        <Link href="/settings/organization" className={linkClass}>
+                          <Settings className="w-4 h-4 mr-1" />
+                          Family Settings
+                        </Link>
+                      )}
+                      {currentOrganization && (
+                        <div className="text-sm text-gray-500 px-3 py-2">
+                          {currentOrganization.name}
+                        </div>
+                      )}
+                    </>
+                  ) : shouldShowCreateFamily ? (
+                    <Link href="/create-family" className={cn(linkClass, "bg-purple-100 text-purple-700 hover:bg-purple-200")}>
+                      <Users className="w-4 h-4 mr-1" />
+                      Create Family
+                    </Link>
+                  ) : null}
+                </>
+              )}
               <UserButton />
             </SignedIn>
           </div>
@@ -132,9 +163,39 @@ export function Navigation() {
               </SignedOut>
 
               <SignedIn>
-                <Link href="/my-cookbook" className={mobileLinkClass} onClick={() => setIsMobileMenuOpen(false)}>
-                  Dashboard
-                </Link>
+                {isLoaded && (
+                  <>
+                    {hasOrganization ? (
+                      <>
+                        <Link href="/dashboard" className={mobileLinkClass} onClick={() => setIsMobileMenuOpen(false)}>
+                          <Home className="w-4 h-4 mr-2 inline" />
+                          Dashboard
+                        </Link>
+                        {shouldShowFamilySettings && (
+                          <Link href="/settings/organization" className={mobileLinkClass} onClick={() => setIsMobileMenuOpen(false)}>
+                            <Settings className="w-4 h-4 mr-2 inline" />
+                            Family Settings
+                          </Link>
+                        )}
+                        {currentOrganization && (
+                          <div className="px-3 py-2 text-sm text-gray-500 border border-gray-200 rounded-md bg-gray-50">
+                            <Users className="w-4 h-4 mr-2 inline" />
+                            {currentOrganization.name}
+                          </div>
+                        )}
+                      </>
+                    ) : shouldShowCreateFamily ? (
+                      <Link 
+                        href="/create-family" 
+                        className={cn(mobileLinkClass, "bg-purple-100 text-purple-700 hover:bg-purple-200")} 
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <Users className="w-4 h-4 mr-2 inline" />
+                        Create Family
+                      </Link>
+                    ) : null}
+                  </>
+                )}
                 <div className="pt-4 border-t border-gray-200 flex justify-center">
                   <UserButton />
                 </div>
