@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { CTAButton } from '../ui/cta-button';
 import { Heart, Shield, Clock } from 'lucide-react';
-import { ButtonVariant, ButtonSize } from '@/app/lib/types/marketing';
+import { ButtonVariant, ButtonSize } from '@/lib/types/marketing';
 
 interface FinalCtaSectionProps {
   className?: string;

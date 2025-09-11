@@ -18,9 +18,9 @@ export function AppTile({ app }: { app: MicroAppDefinition }) {
       </div>
       <div className="flex items-center justify-between">
         <div className="text-sm text-gray-500">Available in: {app.allowedPlans.join(', ')}</div>
-        <Link href={app.route}>
-          <Button size="sm" className="bg-purple-600 hover:bg-purple-700">Open</Button>
-        </Link>
+        <Button asChild size="sm" className="bg-purple-600 hover:bg-purple-700" aria-label={`Open ${app.title}`}>
+          <Link href={app.route}>Open</Link>
+        </Button>
       </div>
     </div>
   );
