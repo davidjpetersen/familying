@@ -150,13 +150,6 @@ function FamilyDashboard({ organization }: { organization: { id: string; name: s
                 Here&apos;s what&apos;s happening with your family
               </p>
             </div>
-            <div className="flex items-center space-x-4">
-              <Link href={FAMILY_ROUTES.organizationSettings}>
-                <Button variant="outline" size="sm">
-                  Family Settings
-                </Button>
-              </Link>
-            </div>
           </div>
         </div>
       </div>
