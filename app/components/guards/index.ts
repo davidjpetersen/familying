@@ -11,4 +11,4 @@ export { OrganizationMemberGuard } from './OrganizationMemberGuard';
 export type { 
   OrganizationRequiredProps,
   OrganizationMemberGuardProps 
-} from '@/lib/types/family-organization-components';
+} from '../../lib/types/family-organization-components';

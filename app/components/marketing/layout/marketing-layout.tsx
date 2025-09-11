@@ -38,7 +38,7 @@ export function MarketingLayout({
       {/* Main content */}
       <main 
         id="main-content"
-        className="w-full"
+        className="w-full py-0"
         role="main"
         aria-label="Marketing page content"
       >

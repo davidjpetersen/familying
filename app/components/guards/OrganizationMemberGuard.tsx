@@ -9,8 +9,8 @@
 
 import React from 'react';
 import { useOrganization, useAuth } from '@clerk/nextjs';
-import { type OrganizationMemberGuardProps } from '@/lib/types/family-organization-components';
-import { hasRequiredRole, getRoleDisplayName } from '@/lib/utils/family-organization';
+import { type OrganizationMemberGuardProps } from '../../lib/types/family-organization-components';
+import { hasRequiredRole, getRoleDisplayName } from '../../lib/utils/family-organization';
 
 /**
  * Role-based access control guard for organization features
@@ -80,7 +80,7 @@ export function OrganizationMemberGuard({
  * Default fallback component for insufficient role
  */
 function OrganizationMemberGuardFallback({ requiredRole }: { requiredRole: string }) {
-  const requiredRoleDisplay = getRoleDisplayName(requiredRole as any);
+  const requiredRoleDisplay = getRoleDisplayName(requiredRole as 'admin' | 'basic_member');
 
   return (
     <div className="min-h-64 flex items-center justify-center bg-gray-50 rounded-lg border border-gray-200">

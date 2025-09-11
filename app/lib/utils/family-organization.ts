@@ -39,6 +39,18 @@ export function hasOrganizations(organizationList: unknown[]): boolean {
   return Array.isArray(organizationList) && organizationList.length > 0;
 }
 
+interface ClerkOrganization {
+  id: string;
+  name: string;
+  slug: string;
+  imageUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+  membersCount?: number;
+  publicMetadata?: Record<string, unknown>;
+  privateMetadata?: Record<string, unknown>;
+}
+
 /**
  * Get the current organization from list (assumes first organization is active)
  */
@@ -47,7 +59,7 @@ export function getCurrentOrganization(organizationList: unknown[]): FamilyOrgan
     return undefined;
   }
   
-  const org = organizationList[0];
+  const org = organizationList[0] as ClerkOrganization;
   if (!org) return undefined;
   
   return {
@@ -361,14 +373,18 @@ export function isFamilyRole(value: unknown): value is FamilyRole {
  * Type guard to check if organization has valid structure
  */
 export function isFamilyOrganization(value: unknown): value is FamilyOrganization {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+  
+  const obj = value as Record<string, unknown>;
+  
   return (
-    value &&
-    typeof value === 'object' &&
-    typeof value.id === 'string' &&
-    typeof value.name === 'string' &&
-    typeof value.slug === 'string' &&
-    value.createdAt instanceof Date &&
-    value.updatedAt instanceof Date &&
-    typeof value.membersCount === 'number'
+    typeof obj.id === 'string' &&
+    typeof obj.name === 'string' &&
+    typeof obj.slug === 'string' &&
+    obj.createdAt instanceof Date &&
+    obj.updatedAt instanceof Date &&
+    typeof obj.membersCount === 'number'
   );
 }

@@ -9,7 +9,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Users, Calendar, Camera, Settings, Plus, ArrowRight } from 'lucide-react';
+import { Users, Calendar, Camera, Plus, Settings } from 'lucide-react';
 import { useOrganizationNavigation } from '../../lib/hooks/useOrganizationNavigation';
 import { Button } from '@/components/ui/button';
 import { FAMILY_ROUTES } from '../../lib/config/family-organization';
@@ -153,105 +153,9 @@ function FamilyDashboard({ organization }: { organization: { id: string; name: s
             <div className="flex items-center space-x-4">
               <Link href={FAMILY_ROUTES.organizationSettings}>
                 <Button variant="outline" size="sm">
-                  <Settings className="w-4 h-4 mr-2" />
                   Family Settings
                 </Button>
               </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <StatCard
-            title="Family Members"
-            value="3"
-            icon={<Users className="h-6 w-6" />}
-            color="blue"
-          />
-          <StatCard
-            title="Upcoming Events"
-            value="5"
-            icon={<Calendar className="h-6 w-6" />}
-            color="green"
-          />
-          <StatCard
-            title="Shared Photos"
-            value="47"
-            icon={<Camera className="h-6 w-6" />}
-            color="purple"
-          />
-        </div>
-
-        {/* Main Content Areas */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Recent Activity */}
-          <div className="bg-white rounded-lg shadow border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
-            </div>
-            <div className="p-6">
-              <div className="space-y-4">
-                <ActivityItem
-                  title="New family photo shared"
-                  description="Sarah added 3 photos from last weekend's trip"
-                  time="2 hours ago"
-                />
-                <ActivityItem
-                  title="Family dinner planned"
-                  description="Mom scheduled dinner for Saturday 6 PM"
-                  time="1 day ago"
-                />
-                <ActivityItem
-                  title="Family meeting reminder"
-                  description="Weekly family check-in this Sunday"
-                  time="2 days ago"
-                />
-              </div>
-              <div className="mt-6 pt-4 border-t border-gray-200">
-                <Link 
-                  href="#" 
-                  className="flex items-center text-sm font-medium text-purple-600 hover:text-purple-700"
-                >
-                  View all activity
-                  <ArrowRight className="w-4 h-4 ml-1" />
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="bg-white rounded-lg shadow border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
-            </div>
-            <div className="p-6">
-              <div className="grid grid-cols-2 gap-4">
-                <QuickActionCard
-                  title="Plan Activity"
-                  description="Schedule family time"
-                  icon={<Calendar className="h-5 w-5" />}
-                  href="#"
-                />
-                <QuickActionCard
-                  title="Share Photos"
-                  description="Upload memories"
-                  icon={<Camera className="h-5 w-5" />}
-                  href="#"
-                />
-                <QuickActionCard
-                  title="Invite Member"
-                  description="Add family member"
-                  icon={<Users className="h-5 w-5" />}
-                  href={FAMILY_ROUTES.organizationSettings}
-                />
-                <QuickActionCard
-                  title="Family Settings"
-                  description="Manage preferences"
-                  icon={<Settings className="h-5 w-5" />}
-                  href={FAMILY_ROUTES.organizationSettings}
-                />
-              </div>
             </div>
           </div>
         </div>
@@ -277,65 +181,5 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode; titl
   );
 }
 
-/**
- * Statistics card component
- */
-function StatCard({ title, value, icon, color }: { title: string; value: string; icon: React.ReactNode; color: string }) {
-  const colorClasses = {
-    blue: 'bg-blue-100 text-blue-600',
-    green: 'bg-green-100 text-green-600',
-    purple: 'bg-purple-100 text-purple-600',
-  };
-
-  return (
-    <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
-      <div className="flex items-center">
-        <div className={`flex-shrink-0 p-2 rounded-lg ${colorClasses[color as keyof typeof colorClasses]}`}>
-          {icon}
-        </div>
-        <div className="ml-3">
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-2xl font-bold text-gray-900">{value}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/**
- * Activity item component
- */
-function ActivityItem({ title, description, time }: { title: string; description: string; time: string }) {
-  return (
-    <div className="flex items-start">
-      <div className="flex-shrink-0 w-2 h-2 bg-purple-400 rounded-full mt-2"></div>
-      <div className="ml-3 flex-1">
-        <p className="text-sm font-medium text-gray-900">{title}</p>
-        <p className="text-sm text-gray-600">{description}</p>
-        <p className="text-xs text-gray-500 mt-1">{time}</p>
-      </div>
-    </div>
-  );
-}
-
-/**
- * Quick action card component
- */
-function QuickActionCard({ title, description, icon, href }: { title: string; description: string; icon: React.ReactNode; href: string }) {
-  return (
-    <Link 
-      href={href}
-      className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200 group"
-    >
-      <div className="flex items-center mb-2">
-        <div className="flex-shrink-0 text-gray-600 group-hover:text-purple-600 transition-colors duration-200">
-          {icon}
-        </div>
-        <h5 className="ml-2 text-sm font-medium text-gray-900">{title}</h5>
-      </div>
-      <p className="text-xs text-gray-600">{description}</p>
-    </Link>
-  );
-}
 
 export default DashboardContent;

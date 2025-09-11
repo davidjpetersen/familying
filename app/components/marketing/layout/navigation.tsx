@@ -7,12 +7,13 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Settings, Users, Home } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
-import { SignedOut, SignInButton, SignedIn, UserButton } from "@clerk/nextjs";
+import { SignedOut, SignInButton, SignedIn, UserButton, useClerk } from "@clerk/nextjs";
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useOrganizationNavigation } from '../../../lib/hooks/useOrganizationNavigation';
+import { Settings } from 'lucide-react';
 
 const Logo = () => {
   const { hasOrganization, isLoaded } = useOrganizationNavigation();
@@ -59,9 +60,28 @@ const mobileLinkClass = cn(
   'focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2'
 );
 
+const CustomUserButton = () => {
+  const { openOrganizationProfile } = useClerk();
+  const { shouldShowFamilySettings } = useOrganizationNavigation();
+
+  return (
+    <UserButton>
+      {shouldShowFamilySettings && (
+        <UserButton.MenuItems>
+          <UserButton.Action
+            label="Family Settings"
+            labelIcon={<Settings className="w-4 h-4" />}
+            onClick={() => openOrganizationProfile()}
+          />
+        </UserButton.MenuItems>
+      )}
+    </UserButton>
+  );
+};
+
 export function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { hasOrganization, shouldShowCreateFamily, shouldShowFamilySettings, currentOrganization, isLoaded } = useOrganizationNavigation();
+  const { hasOrganization, shouldShowCreateFamily, currentOrganization, isLoaded } = useOrganizationNavigation();
 
   return (
     <nav 
@@ -92,15 +112,8 @@ export function Navigation() {
                   {hasOrganization ? (
                     <>
                       <Link href="/dashboard" className={linkClass}>
-                        <Home className="w-4 h-4 mr-1" />
                         Dashboard
                       </Link>
-                      {shouldShowFamilySettings && (
-                        <Link href="/settings/organization" className={linkClass}>
-                          <Settings className="w-4 h-4 mr-1" />
-                          Family Settings
-                        </Link>
-                      )}
                       {currentOrganization && (
                         <div className="text-sm text-gray-500 px-3 py-2">
                           {currentOrganization.name}
@@ -109,13 +122,12 @@ export function Navigation() {
                     </>
                   ) : shouldShowCreateFamily ? (
                     <Link href="/create-family" className={cn(linkClass, "bg-purple-100 text-purple-700 hover:bg-purple-200")}>
-                      <Users className="w-4 h-4 mr-1" />
                       Create Family
                     </Link>
                   ) : null}
                 </>
               )}
-              <UserButton />
+              <CustomUserButton />
             </SignedIn>
           </div>
           
@@ -168,18 +180,10 @@ export function Navigation() {
                     {hasOrganization ? (
                       <>
                         <Link href="/dashboard" className={mobileLinkClass} onClick={() => setIsMobileMenuOpen(false)}>
-                          <Home className="w-4 h-4 mr-2 inline" />
                           Dashboard
                         </Link>
-                        {shouldShowFamilySettings && (
-                          <Link href="/settings/organization" className={mobileLinkClass} onClick={() => setIsMobileMenuOpen(false)}>
-                            <Settings className="w-4 h-4 mr-2 inline" />
-                            Family Settings
-                          </Link>
-                        )}
                         {currentOrganization && (
                           <div className="px-3 py-2 text-sm text-gray-500 border border-gray-200 rounded-md bg-gray-50">
-                            <Users className="w-4 h-4 mr-2 inline" />
                             {currentOrganization.name}
                           </div>
                         )}
@@ -190,14 +194,13 @@ export function Navigation() {
                         className={cn(mobileLinkClass, "bg-purple-100 text-purple-700 hover:bg-purple-200")} 
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
-                        <Users className="w-4 h-4 mr-2 inline" />
                         Create Family
                       </Link>
                     ) : null}
                   </>
                 )}
                 <div className="pt-4 border-t border-gray-200 flex justify-center">
-                  <UserButton />
+                  <CustomUserButton />
                 </div>
               </SignedIn>
             </div>

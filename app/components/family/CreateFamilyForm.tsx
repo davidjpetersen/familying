@@ -9,13 +9,11 @@
 
 import React, { useState, useCallback } from 'react';
 import { CreateOrganization } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
 import { useFamilyCreation } from '../../lib/hooks/useFamilyCreation';
 import { FAMILY_ROUTES } from '../../lib/config/family-organization';
 import { cn } from '@/lib/utils';
 
 interface CreateFamilyFormProps {
-  onCreated?: (organizationId: string) => void;
   onCancel?: () => void;
   className?: string;
   redirectAfterCreation?: boolean;
@@ -27,33 +25,31 @@ interface CreateFamilyFormProps {
  * with custom family creation logic and styling
  */
 export function CreateFamilyForm({
-  onCreated,
   onCancel,
   className,
   redirectAfterCreation = true,
   redirectPath = FAMILY_ROUTES.dashboard,
 }: CreateFamilyFormProps) {
-  const router = useRouter();
   const { isCreating, error, reset } = useFamilyCreation();
   const [showClerkForm] = useState(true);
 
   /**
    * Handle successful family creation
    */
-  const handleCreated = useCallback((organization: { id: string }) => {
-    console.log('Family organization created:', organization);
-    
-    // Call the provided callback
-    onCreated?.(organization.id);
-    
-    // Reset any error state
-    reset();
-    
-    // Navigate to dashboard if redirect is enabled
-    if (redirectAfterCreation) {
-      router.push(redirectPath);
-    }
-  }, [onCreated, reset, redirectAfterCreation, redirectPath, router]);
+  // const handleCreated = useCallback((organization: { id: string }) => {
+  //   console.log('Family organization created:', organization);
+  //   
+  //   // Call the provided callback
+  //   onCreated?.(organization.id);
+  //   
+  //   // Reset any error state
+  //   reset();
+  //   
+  //   // Navigate to dashboard if redirect is enabled
+  //   if (redirectAfterCreation) {
+  //     router.push(redirectPath);
+  //   }
+  // }, [onCreated, reset, redirectAfterCreation, redirectPath, router]);
 
   /**
    * Handle form cancellation
@@ -182,7 +178,6 @@ export function CreateFamilyForm({
             skipInvitationScreen={true}
             hideSlug={false}
             afterCreateOrganizationUrl={redirectAfterCreation ? redirectPath : undefined}
-            onCreated={handleCreated}
           />
         </div>
       )}

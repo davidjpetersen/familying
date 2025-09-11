@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 export interface UseFamilyCreationReturn {
   isCreating: boolean;
   error?: string;
-  createFamily: (name: string, metadata?: Record<string, unknown>) => Promise<void>;
+  createFamily: (name: string) => Promise<void>;
   reset: () => void;
 }
 
@@ -28,7 +28,7 @@ export function useFamilyCreation(): UseFamilyCreationReturn {
   /**
    * Create a new family organization
    */
-  const createFamily = useCallback(async (name: string, _metadata?: Record<string, unknown>) => {
+  const createFamily = useCallback(async (name: string) => {
     // Prevent multiple simultaneous creation attempts
     if (isCreating) {
       return;
