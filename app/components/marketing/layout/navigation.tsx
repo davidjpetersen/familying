@@ -182,11 +182,11 @@ export function Navigation() {
                         <Link href="/dashboard" className={mobileLinkClass} onClick={() => setIsMobileMenuOpen(false)}>
                           Dashboard
                         </Link>
-                        {currentOrganization && (
+                        {/* {currentOrganization && (
                           <div className="px-3 py-2 text-sm text-gray-500 border border-gray-200 rounded-md bg-gray-50">
                             {currentOrganization.name}
                           </div>
-                        )}
+                        )} */}
                       </>
                     ) : shouldShowCreateFamily ? (
                       <Link 
