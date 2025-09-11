@@ -13,6 +13,9 @@ import { Users, Calendar, Camera, Plus, Settings } from 'lucide-react';
 import { useOrganizationNavigation } from '../../lib/hooks/useOrganizationNavigation';
 import { Button } from '@/components/ui/button';
 import { FAMILY_ROUTES } from '../../lib/config/family-organization';
+import AppTile from '@/app/components/apps/AppTile';
+import { MicroApps } from '@/app/lib/apps/registry';
+import '@/app/lib/apps/registerAll';
 
 /**
  * Main dashboard content that adapts based on organization membership
@@ -150,6 +153,17 @@ function FamilyDashboard({ organization }: { organization: { id: string; name: s
                 Here&apos;s what&apos;s happening with your family
               </p>
             </div>
+          </div>
+        </div>
+        {/* Micro-apps tiles */}
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Apps</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {MicroApps.getApps()
+              .filter((a) => a.dashboardSlots?.includes('home'))
+              .map((app) => (
+                <AppTile key={app.id} app={app} />
+              ))}
           </div>
         </div>
       </div>
