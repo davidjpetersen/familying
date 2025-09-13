@@ -1,5 +1,5 @@
 import { SignIn } from "@clerk/nextjs";
-import { Navigation } from "@/app/components/marketing/layout/navigation";
+import { Navigation } from "@/components/layout/navigation";
 
 const SignInPage = () => {
   return (

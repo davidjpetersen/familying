@@ -1,8 +1,8 @@
 "use client";
 import { useMemo, useState, useEffect } from 'react';
-import { mixes } from '@/app/lib/soundscapes/mixes';
-import { useSoundscapePlayer } from '@/app/components/soundscapes/Player';
-import { Analytics } from '@/app/lib/analytics/events';
+import { mixes } from '@/lib/soundscapes/mixes';
+import { useSoundscapePlayer } from '@/components/soundscapes/Player';
+import { Analytics } from '@/lib/analytics/events';
 import { Button } from '@/components/ui/button';
 
 export default function KidSoundscapesPage({ params }: { params: { childId: string } }) {

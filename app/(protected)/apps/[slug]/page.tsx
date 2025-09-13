@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { MicroApps } from '@/app/lib/apps/registry';
-import '@/app/lib/apps/registerAll';
-import { getFlag } from '@/app/lib/flags';
-import { isEntitled } from '@/app/lib/entitlements';
+import { MicroApps } from '@/lib/apps/registry';
+import '@/lib/apps/registerAll';
+import { getFlag } from '@/lib/flags';
+import { isEntitled } from '@/lib/entitlements';
 
 // Server component to route to the micro-app page
 export default async function AppPage({ params }: { params: { slug: string } }) {
@@ -24,7 +24,7 @@ export default async function AppPage({ params }: { params: { slug: string } }) 
 function resolveAppModule(slug: string) {
   switch (slug) {
     case 'soundscapes':
-      return import('@/app/(protected)/apps/soundscapes/page');
+      return import('@/(protected)/apps/soundscapes/page');
     default:
       return Promise.reject(new Error('Unknown app'));
   }

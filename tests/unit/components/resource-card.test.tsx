@@ -5,8 +5,8 @@
  */
 
 import { render, screen, fireEvent } from '@testing-library/react';
-import { ResourceCard } from '@/app/components/marketing/ui/resource-card';
-import { ResourcePreview, ResourceCategory } from '@/app/lib/types/marketing';
+import { ResourceCard } from '@/components/marketing/ui/resource-card';
+import { ResourcePreview, ResourceCategory } from '@/lib/types/marketing';
 
 describe('ResourceCard Contract Tests', () => {
   const mockResource: ResourcePreview = {

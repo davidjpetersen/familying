@@ -5,8 +5,8 @@
  */
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { HowItWorksSection } from '@/app/components/marketing/sections/how-it-works-section';
-import { HowItWorksContent, ProcessStep } from '@/app/lib/types/marketing';
+import { HowItWorksSection } from '@/components/marketing/sections/how-it-works-section';
+import { HowItWorksContent, ProcessStep } from '@/lib/types/marketing';
 
 describe('HowItWorksSection Integration Tests', () => {
   const mockSteps: ProcessStep[] = [

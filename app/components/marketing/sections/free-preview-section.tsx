@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { ResourceCard } from '../ui/resource-card';
 import { CTAButton } from '../ui/cta-button';
-import { ResourcePreview, ButtonVariant, ButtonSize } from '@/app/lib/types/marketing';
+import { ResourcePreview, ButtonVariant, ButtonSize } from '@/lib/types/marketing';
 
 interface FreePreviewSectionProps {
   resources: ResourcePreview[];

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { mixes, MixConfig } from '@/app/lib/soundscapes/mixes';
+import { mixes, MixConfig } from '@/lib/soundscapes/mixes';
 
 type PlayerStatus = 'idle' | 'playing' | 'stopped' | 'fading';
 

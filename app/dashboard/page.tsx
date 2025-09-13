@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { Navigation } from "@/app/components/marketing/layout/navigation";
-import { DashboardContent } from "@/app/components/dashboard/DashboardContent";
+import { Navigation } from "@/components/layout/navigation";
+import { DashboardContent } from "@/components/dashboard/DashboardContent";
 import { FAMILY_ROUTES } from "../lib/config/family-organization";
 
 const DashboardPage = async () => {

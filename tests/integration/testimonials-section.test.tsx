@@ -5,7 +5,7 @@
  */
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { TestimonialsSection } from '@/app/components/marketing/sections/testimonials-section';
+import { TestimonialsSection } from '@/components/marketing/sections/testimonials-section';
 import { 
   TestimonialContent, 
   TestimonialItem, 
@@ -13,7 +13,7 @@ import {
   Avatar, 
   AvatarSource,
   Demographics 
-} from '@/app/lib/types/marketing';
+} from '@/lib/types/marketing';
 
 describe('TestimonialsSection Integration Tests', () => {
   const mockDemographics: Demographics = {

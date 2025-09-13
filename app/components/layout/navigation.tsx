@@ -12,7 +12,7 @@ import Link from 'next/link';
 import { SignedOut, SignInButton, SignedIn, UserButton, useClerk } from "@clerk/nextjs";
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { useOrganizationNavigation } from '../../../lib/hooks/useOrganizationNavigation';
+import { useOrganizationNavigation } from '@/lib/hooks/useOrganizationNavigation';
 import { Settings } from 'lucide-react';
 
 const Logo = () => {

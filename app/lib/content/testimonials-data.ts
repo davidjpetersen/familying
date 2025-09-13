@@ -3,7 +3,7 @@
  * Constitutional compliance: Privacy-first testimonials with AI-generated avatars
  */
 
-import { TestimonialItem, AvatarSource } from '@/app/lib/types/marketing';
+import { TestimonialItem, AvatarSource } from '@/lib/types/marketing';
 
 export const mockTestimonials: TestimonialItem[] = [
   {

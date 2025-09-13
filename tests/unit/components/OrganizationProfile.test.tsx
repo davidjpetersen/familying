@@ -120,7 +120,7 @@ const MockOrganizationProfileWrapper = jest.fn<React.ReactElement, [Organization
 );
 
 // Mock the module
-jest.mock('@/app/components/family/OrganizationProfile', () => ({
+jest.mock('@/components/family/OrganizationProfile', () => ({
   OrganizationProfile: MockOrganizationProfileWrapper,
 }));
 

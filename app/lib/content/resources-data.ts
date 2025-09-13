@@ -3,7 +3,7 @@
  * Constitutional compliance: Transparent value proposition, accessible resources
  */
 
-import { ResourcePreview, ResourceCategory } from '@/app/lib/types/marketing';
+import { ResourcePreview, ResourceCategory } from '@/lib/types/marketing';
 
 export const mockResources: ResourcePreview[] = [
   {

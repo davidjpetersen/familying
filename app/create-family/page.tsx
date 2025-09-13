@@ -9,7 +9,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
-import { CreateFamilyForm } from '@/app/components/family/CreateFamilyForm';
+import { CreateFamilyForm } from '@/components/family/CreateFamilyForm';
 import { FAMILY_ROUTES } from '../lib/config/family-organization';
 
 export const metadata: Metadata = {

@@ -5,8 +5,8 @@
  */
 
 import { render, screen, fireEvent } from '@testing-library/react';
-import { CTAButton } from '@/app/components/marketing/ui/cta-button';
-import { CTAButton as CTAButtonType, ButtonVariant, ButtonSize } from '@/app/lib/types/marketing';
+import { CTAButton } from '@/components/marketing/ui/cta-button';
+import { CTAButton as CTAButtonType, ButtonVariant, ButtonSize } from '@/lib/types/marketing';
 
 describe('CTAButton Contract Tests', () => {
   const mockButton: CTAButtonType = {

@@ -5,14 +5,14 @@
  */
 
 import { render, screen } from '@testing-library/react';
-import { TestimonialCard } from '@/app/components/marketing/ui/testimonial-card';
+import { TestimonialCard } from '@/components/marketing/ui/testimonial-card';
 import { 
   TestimonialItem, 
   Avatar, 
   Attribution, 
   AvatarSource,
   Demographics 
-} from '@/app/lib/types/marketing';
+} from '@/lib/types/marketing';
 
 describe('TestimonialCard Contract Tests', () => {
   const mockDemographics: Demographics = {

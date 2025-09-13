@@ -1,4 +1,4 @@
-import { createSupabaseClient } from '@/app/lib/supabase';
+import { createSupabaseClient } from '@/lib/supabase';
 
 export async function toggleFavorite({ mixId, familyId, childId }: { mixId: string; familyId: string; childId?: string | null }) {
   const supabase = createSupabaseClient();

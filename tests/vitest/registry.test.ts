@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { MicroApps } from '@/app/lib/apps/registry';
+import { MicroApps } from '@/lib/apps/registry';
 
 describe('registry selectors', () => {
   it('filters by plan and role and flag', () => {

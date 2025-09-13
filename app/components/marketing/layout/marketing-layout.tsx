@@ -7,7 +7,7 @@
 
 import { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
-import { Navigation } from './navigation';
+import { Navigation } from '@/components/layout/navigation';
 
 interface MarketingLayoutProps {
   children: ReactNode;

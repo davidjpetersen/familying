@@ -1,6 +1,6 @@
 "use client";
 import Link from 'next/link';
-import { MicroAppDefinition } from '@/app/lib/apps/registry';
+import { MicroAppDefinition } from '@/lib/apps/registry';
 import { Button } from '@/components/ui/button';
 
 export function AppTile({ app }: { app: MicroAppDefinition }) {

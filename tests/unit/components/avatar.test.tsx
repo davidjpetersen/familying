@@ -5,8 +5,8 @@
  */
 
 import { render, screen } from '@testing-library/react';
-import { Avatar } from '@/app/components/marketing/ui/avatar';
-import { Avatar as AvatarType, AvatarSource, Demographics, ImageVariant } from '@/app/lib/types/marketing';
+import { Avatar } from '@/components/marketing/ui/avatar';
+import { Avatar as AvatarType, AvatarSource, Demographics, ImageVariant } from '@/lib/types/marketing';
 
 describe('Avatar Contract Tests', () => {
   const mockDemographics: Demographics = {

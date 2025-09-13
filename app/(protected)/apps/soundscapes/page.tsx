@@ -1,9 +1,9 @@
 "use client";
 import { useMemo, useState } from 'react';
-import { mixes } from '@/app/lib/soundscapes/mixes';
-import { useSoundscapePlayer } from '@/app/components/soundscapes/Player';
-import Controls from '@/app/components/soundscapes/Controls';
-import { Analytics } from '@/app/lib/analytics/events';
+import { mixes } from '@/lib/soundscapes/mixes';
+import { useSoundscapePlayer } from '@/components/soundscapes/Player';
+import Controls from '@/components/soundscapes/Controls';
+import { Analytics } from '@/lib/analytics/events';
 import { Button } from '@/components/ui/button';
 
 export default function SoundscapesPage() {

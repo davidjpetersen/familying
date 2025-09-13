@@ -119,7 +119,7 @@ const MockCreateFamilyForm = jest.fn<React.ReactElement, [CreateFamilyFormProps]
 );
 
 // Mock the module
-jest.mock('@/app/components/family/CreateFamilyForm', () => ({
+jest.mock('@/components/family/CreateFamilyForm', () => ({
   CreateFamilyForm: MockCreateFamilyForm,
 }));
 

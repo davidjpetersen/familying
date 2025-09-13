@@ -5,8 +5,8 @@
  */
 
 import { render, screen, fireEvent } from '@testing-library/react';
-import { ProcessStep } from '@/app/components/marketing/ui/process-step';
-import { ProcessStep as ProcessStepType } from '@/app/lib/types/marketing';
+import { ProcessStep } from '@/components/marketing/ui/process-step';
+import { ProcessStep as ProcessStepType } from '@/lib/types/marketing';
 
 // Mock framer-motion for testing
 jest.mock('framer-motion', () => ({

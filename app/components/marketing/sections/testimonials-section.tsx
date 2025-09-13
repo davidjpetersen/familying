@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { TestimonialCard } from '../ui/testimonial-card';
-import { TestimonialItem } from '@/app/lib/types/marketing';
+import { TestimonialItem } from '@/lib/types/marketing';
 
 interface TestimonialsSectionProps {
   testimonials: TestimonialItem[];

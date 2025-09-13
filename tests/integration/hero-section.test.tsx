@@ -5,8 +5,8 @@
  */
 
 import { render, screen, fireEvent } from '@testing-library/react';
-import { HeroSection } from '@/app/components/marketing/sections/hero-section';
-import { HeroContent, ButtonVariant, ButtonSize } from '@/app/lib/types/marketing';
+import { HeroSection } from '@/components/marketing/sections/hero-section';
+import { HeroContent, ButtonVariant, ButtonSize } from '@/lib/types/marketing';
 
 describe('HeroSection Integration Tests', () => {
   const mockHeroContent: HeroContent = {

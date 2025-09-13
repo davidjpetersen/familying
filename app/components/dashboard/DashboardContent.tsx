@@ -13,9 +13,9 @@ import { Users, Calendar, Camera, Plus, Settings } from 'lucide-react';
 import { useOrganizationNavigation } from '../../lib/hooks/useOrganizationNavigation';
 import { Button } from '@/components/ui/button';
 import { FAMILY_ROUTES } from '../../lib/config/family-organization';
-import AppTile from '@/app/components/apps/AppTile';
-import { MicroApps } from '@/app/lib/apps/registry';
-import '@/app/lib/apps/registerAll';
+import AppTile from '@/components/apps/AppTile';
+import { MicroApps } from '@/lib/apps/registry';
+import '@/lib/apps/registerAll';
 
 /**
  * Main dashboard content that adapts based on organization membership

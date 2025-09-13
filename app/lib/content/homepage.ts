@@ -4,13 +4,13 @@
  * Based on specification requirements and research findings
  */
 
-import { 
-  MarketingContent, 
-  SectionType, 
-  ButtonVariant, 
+import {
+  MarketingContent,
+  SectionType,
+  ButtonVariant,
   ButtonSize,
   CTAButton
-} from "@/app/lib/types/marketing";
+} from "@/lib/types/marketing";
 
 // Primary CTA button template
 const createPrimaryCTA = (id: string, text: string = "Start My Quiz"): CTAButton => ({

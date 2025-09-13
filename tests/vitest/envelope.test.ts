@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { linearEnvelopeSteps } from '@/app/lib/soundscapes/envelope';
+import { linearEnvelopeSteps } from '@/lib/soundscapes/envelope';
 
 describe('linearEnvelopeSteps', () => {
   it('computes steps and values', () => {
