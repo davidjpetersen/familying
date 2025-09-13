@@ -50,12 +50,12 @@ function DashboardLoading() {
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-4xl mx-auto">
         <div className="animate-pulse">
-          <div className="bg-gray-200 h-8 w-64 rounded mb-4"></div>
-          <div className="bg-gray-200 h-4 w-96 rounded mb-8"></div>
+          <div className="bg-gray-200 dark:bg-gray-700 h-8 w-64 rounded mb-4"></div>
+          <div className="bg-gray-200 dark:bg-gray-700 h-4 w-96 rounded mb-8"></div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-gray-200 h-48 rounded-lg"></div>
+              <div key={i} className="bg-gray-200 dark:bg-gray-700 h-48 rounded-lg"></div>
             ))}
           </div>
         </div>
@@ -69,7 +69,7 @@ function DashboardLoading() {
  */
 function CreateFamilyDashboard() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
@@ -77,23 +77,23 @@ function CreateFamilyDashboard() {
             <div className="mx-auto h-16 w-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
               <Users className="h-8 w-8 text-purple-600" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
               Welcome to Familying.org!
             </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               Start your family organization journey by creating your family profile. 
               This will be your central hub for managing activities, schedules, and memories together.
             </p>
           </div>
 
           {/* Create Family CTA */}
-          <div className="bg-white rounded-lg shadow-lg p-8 mb-12">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-12">
             <div className="flex flex-col md:flex-row items-center justify-between">
               <div className="mb-6 md:mb-0">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+                <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
                   Create Your Family Organization
                 </h2>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-300">
                   Set up your family profile to get started with collaborative planning and organization.
                 </p>
               </div>
@@ -108,7 +108,7 @@ function CreateFamilyDashboard() {
 
           {/* Features Preview */}
           <div className="mb-12">
-            <h3 className="text-xl font-semibold text-gray-900 mb-6 text-center">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 text-center">
               What you can do with your family organization:
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -146,10 +146,10 @@ function FamilyDashboard({ organization }: { organization: { id: string; name: s
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 Welcome back to {organization.name}
               </h1>
-              <p className="text-gray-600 mt-2">
+              <p className="text-gray-600 dark:text-gray-300 mt-2">
                 Here&apos;s what&apos;s happening with your family
               </p>
             </div>
@@ -157,7 +157,7 @@ function FamilyDashboard({ organization }: { organization: { id: string; name: s
         </div>
         {/* Micro-apps tiles */}
         <div className="mt-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Apps</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Apps</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {MicroApps.getApps()
               .filter((a) => a.dashboardSlots?.includes('home'))
@@ -176,14 +176,14 @@ function FamilyDashboard({ organization }: { organization: { id: string; name: s
  */
 function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
   return (
-    <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700">
       <div className="flex items-center mb-4">
-        <div className="flex-shrink-0 p-2 bg-purple-100 rounded-lg text-purple-600">
+        <div className="flex-shrink-0 p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg text-purple-600 dark:text-purple-400">
           {icon}
         </div>
-        <h4 className="ml-3 text-lg font-medium text-gray-900">{title}</h4>
+        <h4 className="ml-3 text-lg font-medium text-gray-900 dark:text-white">{title}</h4>
       </div>
-      <p className="text-gray-600">{description}</p>
+      <p className="text-gray-600 dark:text-gray-300">{description}</p>
     </div>
   );
 }

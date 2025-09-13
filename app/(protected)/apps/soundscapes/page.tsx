@@ -23,8 +23,8 @@ export default function SoundscapesPage() {
       <Navigation />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-2xl font-bold mb-4">Soundscapes</h1>
-        <p className="text-gray-600 mb-6">Quickly start focus, reading, or bedtime mixes.</p>
+        <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Soundscapes</h1>
+        <p className="text-gray-600 dark:text-gray-300 mb-6">Quickly start focus, reading, or bedtime mixes.</p>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6" role="list" aria-label="Soundscape mixes">
           {mixes.map((m) => (
@@ -34,7 +34,7 @@ export default function SoundscapesPage() {
           ))}
         </div>
 
-        <div className="mb-6 text-sm text-gray-500">Selected: {current.title}</div>
+        <div className="mb-6 text-sm text-gray-500 dark:text-gray-400">Selected: {current.title}</div>
 
         <Controls
           onStart={onStart}

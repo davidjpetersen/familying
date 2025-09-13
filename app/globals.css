@@ -112,6 +112,50 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* Clerk Dark Mode Variables */
+:root {
+  /* Light theme variables for Clerk */
+  --cl-color-primary: theme(colors.purple.600);
+  --cl-color-primary-foreground: white;
+  --cl-color-secondary: theme(colors.gray.100);
+  --cl-color-secondary-foreground: theme(colors.gray.900);
+  --cl-color-background: white;
+  --cl-color-foreground: theme(colors.gray.900);
+  --cl-color-muted: theme(colors.gray.50);
+  --cl-color-muted-foreground: theme(colors.gray.600);
+  --cl-color-accent: theme(colors.purple.50);
+  --cl-color-accent-foreground: theme(colors.purple.900);
+  --cl-color-card: white;
+  --cl-color-card-foreground: theme(colors.gray.900);
+  --cl-color-border: theme(colors.gray.200);
+  --cl-color-input: theme(colors.gray.100);
+  --cl-radius: 0.625rem;
+  --cl-shadow-small: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --cl-shadow-medium: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --cl-shadow-large: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.dark {
+  /* Dark theme variables for Clerk */
+  --cl-color-primary: theme(colors.purple.500);
+  --cl-color-primary-foreground: white;
+  --cl-color-secondary: theme(colors.gray.800);
+  --cl-color-secondary-foreground: theme(colors.gray.100);
+  --cl-color-background: theme(colors.gray.900);
+  --cl-color-foreground: theme(colors.gray.100);
+  --cl-color-muted: theme(colors.gray.800);
+  --cl-color-muted-foreground: theme(colors.gray.400);
+  --cl-color-accent: theme(colors.purple.900) / 0.2;
+  --cl-color-accent-foreground: theme(colors.purple.300);
+  --cl-color-card: theme(colors.gray.800);
+  --cl-color-card-foreground: theme(colors.gray.100);
+  --cl-color-border: theme(colors.gray.700);
+  --cl-color-input: theme(colors.gray.800);
+  --cl-shadow-small: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --cl-shadow-medium: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --cl-shadow-large: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

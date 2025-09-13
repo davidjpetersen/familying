@@ -46,8 +46,8 @@ export function MarketingLayout({
       </main>
       
       {/* Footer */}
-      <footer 
-        className="bg-gray-50 border-t border-gray-200 py-12"
+      <footer
+        className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 py-12"
         role="contentinfo"
         aria-label="Site footer"
       >
@@ -59,25 +59,25 @@ export function MarketingLayout({
                 <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-lg">♥</span>
                 </div>
-                <span className="text-xl font-bold text-gray-900">Familying.org</span>
+                <span className="text-xl font-bold text-gray-900 dark:text-white">Familying.org</span>
               </div>
-              <p className="text-gray-600 mb-4 max-w-md">
+              <p className="text-gray-600 dark:text-gray-300 mb-4 max-w-md">
                 Helping families create stronger connections through personalized strategies 
                 for meal planning, bedtime routines, and quality time.
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 © 2025 Familying.org. All rights reserved.
               </p>
             </div>
             
             {/* Quick Links */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-4">Quick Links</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Quick Links</h3>
               <ul className="space-y-2 text-sm">
                 <li>
                   <a 
                     href="/quiz" 
-                    className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
+                    className="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
                   >
                     Take the Quiz
                   </a>
@@ -85,7 +85,7 @@ export function MarketingLayout({
                 <li>
                   <a 
                     href="/resources" 
-                    className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
+                    className="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
                   >
                     Free Resources
                   </a>
@@ -93,7 +93,7 @@ export function MarketingLayout({
                 <li>
                   <a 
                     href="/about" 
-                    className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
+                    className="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
                   >
                     About Us
                   </a>
@@ -101,7 +101,7 @@ export function MarketingLayout({
                 <li>
                   <a 
                     href="/contact" 
-                    className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
+                    className="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
                   >
                     Contact
                   </a>
@@ -111,12 +111,12 @@ export function MarketingLayout({
             
             {/* Legal */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-4">Legal</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Legal</h3>
               <ul className="space-y-2 text-sm">
                 <li>
                   <a 
                     href="/privacy" 
-                    className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
+                    className="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
                   >
                     Privacy Policy
                   </a>
@@ -124,7 +124,7 @@ export function MarketingLayout({
                 <li>
                   <a 
                     href="/terms" 
-                    className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
+                    className="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
                   >
                     Terms of Service
                   </a>
@@ -132,7 +132,7 @@ export function MarketingLayout({
                 <li>
                   <a 
                     href="/accessibility" 
-                    className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
+                    className="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
                   >
                     Accessibility
                   </a>
