@@ -114,11 +114,11 @@ export function Navigation() {
                       <Link href="/dashboard" className={linkClass}>
                         Dashboard
                       </Link>
-                      {currentOrganization && (
+                      {/* {currentOrganization && (
                         <div className="text-sm text-gray-500 px-3 py-2">
                           {currentOrganization.name}
                         </div>
-                      )}
+                      )} */}
                     </>
                   ) : shouldShowCreateFamily ? (
                     <Link href="/create-family" className={cn(linkClass, "bg-purple-100 text-purple-700 hover:bg-purple-200")}>
