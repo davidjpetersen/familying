@@ -5,6 +5,7 @@ import { useSoundscapePlayer } from '@/components/soundscapes/Player';
 import Controls from '@/components/soundscapes/Controls';
 import { Analytics } from '@/lib/analytics/events';
 import { Button } from '@/components/ui/button';
+import { Navigation } from '@/components/layout/navigation';
 
 export default function SoundscapesPage() {
   const [selected, setSelected] = useState(mixes[0].id);
@@ -18,7 +19,9 @@ export default function SoundscapesPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <>
+      <Navigation />
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-3xl mx-auto">
         <h1 className="text-2xl font-bold mb-4">Soundscapes</h1>
         <p className="text-gray-600 mb-6">Quickly start focus, reading, or bedtime mixes.</p>
@@ -49,6 +52,7 @@ export default function SoundscapesPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
